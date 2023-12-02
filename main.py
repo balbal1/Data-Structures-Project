@@ -1,10 +1,12 @@
 from PySide2.QtWidgets import QApplication
 import sys
 from MainWindow import MainWindow
+from xmlTree import xmlTree
 
+tree = xmlTree()
 
 app = QApplication(sys.argv)
-window = MainWindow()
+window = MainWindow(tree)
 window.show()
 
 with open("style.qss", "r") as f:

@@ -4,7 +4,7 @@ from Button import Button
 
 class MainWindow(QMainWindow):
     
-    def __init__(self):
+    def __init__(self, tree):
         super(MainWindow, self).__init__()
     
         self.setGeometry(400, 200, 1200, 800)
@@ -22,7 +22,7 @@ class MainWindow(QMainWindow):
         convertButton = Button("icons/ConvertSymbol", "Convert")
         compressButton = Button("icons/CompressSymbol", "Compress")
         
-        openButton.clicked.connect(lambda textArea=inputTextArea: self.openHandle(textArea))
+        openButton.clicked.connect(lambda textArea=inputTextArea: self.openHandle(textArea, tree))
         helpButton.clicked.connect(self.helpHandle)
         closeButton.clicked.connect(self.closeHandle)
         
@@ -48,13 +48,14 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
         
         
-    def openHandle(self, textArea):
+    def openHandle(self, textArea, tree):
         path = QFileDialog.getOpenFileName(self, 'Choose a file', '', 'xml files (*.xml)')
         if path != ('', ''):
             textArea.clear()
             with open(path[0]) as file_in:
                 for line in file_in:
                     textArea.insertPlainText(line)
+            tree.setTree(path[0])
                     
     def helpHandle(self):
         QMessageBox.about(QPushButton(), "Help", "This is the help Section.")
