@@ -2,8 +2,12 @@ from PySide2.QtWidgets import QApplication
 import sys
 from MainWindow import MainWindow
 from xmlTree import xmlTree
+from errors_detection import error_detection
+from open_file import open_xml
 
-tree = xmlTree()
+tree=xmlTree()
+text=open_xml('sample.xml')
+error_detection(text)
 
 app = QApplication(sys.argv)
 window = MainWindow(tree)
