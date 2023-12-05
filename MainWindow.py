@@ -1,4 +1,5 @@
 from PySide2.QtWidgets import QMainWindow, QWidget, QPushButton, QMessageBox, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QTabWidget, QFileDialog
+from PySide2.QtGui import QIcon, QTextCharFormat, QFont, Qt
 import sys
 from Button import Button
 
@@ -8,10 +9,17 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
     
         self.setGeometry(400, 200, 1200, 800)
-        
+        self.setWindowTitle(" XML Editor")
+        self.setWindowIcon(QIcon("icons/logo.png"))
+
         inputTextArea = QPlainTextEdit()
         outputTextArea = QPlainTextEdit()
-                
+
+        myClassFormat = QTextCharFormat()
+        myClassFormat.setForeground(Qt.red)
+        inputTextArea.setCurrentCharFormat(myClassFormat)
+        inputTextArea.insertPlainText("This is some red text.")
+        
         openButton = Button("icons/OpenSymbol", "Open File")
         saveButton = Button("icons/SaveSymbol", "Save")
         helpButton = Button("icons/HelpSymbol", "Help")
@@ -23,6 +31,7 @@ class MainWindow(QMainWindow):
         compressButton = Button("icons/CompressSymbol", "Compress")
         
         openButton.clicked.connect(lambda textArea=inputTextArea: self.openHandle(textArea, tree))
+        saveButton.clicked.connect(lambda textArea=inputTextArea: self.saveHandle(textArea, tree))
         helpButton.clicked.connect(self.helpHandle)
         closeButton.clicked.connect(self.closeHandle)
         
@@ -56,7 +65,15 @@ class MainWindow(QMainWindow):
                 for line in file_in:
                     textArea.insertPlainText(line)
             tree.setTree(path[0])
-                    
+
+    def saveHandle(self, textArea, tree):
+        path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'xml files (*.xml)')
+        if path != ('', ''):
+            file = open(path[0], 'w')
+            text = textArea.toPlainText()
+            file.write(text)
+            file.close()
+        
     def helpHandle(self):
         QMessageBox.about(QPushButton(), "Help", "This is the help Section.")
     
