@@ -77,4 +77,4 @@ if openStack != []:
         updateTags(line_Count,'Missing Close tag',openStack[-1])
         openStack.pop()
         
-print(tags)
+return tags
