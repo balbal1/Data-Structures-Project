@@ -4,7 +4,11 @@ QPushButton {
 }
 
 QPushButton:hover {
-		background-color: rgb(212, 219, 237);
+	background-color: rgb(215, 226, 255);
+}
+
+#disabled {
+	background-color: rgb(170, 170, 170);
 }
 
 #bars {

@@ -14,6 +14,7 @@ class MainWindow(QMainWindow):
 
         inputTextArea = QPlainTextEdit()
         outputTextArea = QPlainTextEdit()
+        outputTextArea.setReadOnly(True)
 
         myClassFormat = QTextCharFormat()
         myClassFormat.setForeground(Qt.red)
@@ -30,6 +31,13 @@ class MainWindow(QMainWindow):
         convertButton = Button("icons/ConvertSymbol", "Convert")
         compressButton = Button("icons/CompressSymbol", "Compress")
         
+        formatButton.disabled = True
+        convertButton.disabled = True
+        compressButton.disabled = True
+        formatButton.setObjectName("disabled")
+        convertButton.setObjectName("disabled")
+        compressButton.setObjectName("disabled")
+
         openButton.clicked.connect(lambda textArea=inputTextArea: self.openHandle(textArea, tree))
         saveButton.clicked.connect(lambda textArea=inputTextArea: self.saveHandle(textArea, tree))
         helpButton.clicked.connect(self.helpHandle)
