@@ -1,10 +1,5 @@
 class Node():
 
-    name = ""
-    text = ""
-    children = []
-    level = 0
-
     def __init__(self, name = "", text = "", children = [], level = 0):
         self.name = name
         self.text = text
@@ -31,9 +26,17 @@ class Node():
         pass
 
     def print(self):
-        print("  " * self.level, "<" + self.name + ">", self.text)
-        for i in self.children:
-            i.print()
+        for line in self.stringify():
+            print(line)
+
+    def stringify(self):
+        if self.children == []:
+            return ["  " * self.level + "<" + self.name + ">" + str(self.text) + "</" + self.name + ">"]
+        string = ["  " * self.level + "<" + self.name + ">"]
+        for child in self.children:
+            string.extend(child.stringify())
+        string.append("  " * self.level + "</" + self.name + ">")
+        return string
 
     def getTest(self):
         names = ["Ali", "Ahmed", "Ahmed", "Hagar", "Rana"]
