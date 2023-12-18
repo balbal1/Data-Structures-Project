@@ -14,7 +14,13 @@ class Node():
         pass
 
     def minify(self):
-        pass
+        if self.children == []:
+            return "<" + self.name + ">" + str(self.text) + "</" + self.name + ">"
+        string = "<" + self.name + ">"
+        for child in self.children:
+            string += child.minify()
+        string += "</" + self.name + ">"
+        return string
 
     def convert(self):
         pass
