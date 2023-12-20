@@ -11,7 +11,7 @@ class Button(QPushButton):
     def __init__(self, icon, word):
         super(Button, self).__init__()
         
-        self.setFixedSize(80,100)
+        self.setFixedSize(100,120)
         layout = QVBoxLayout()
         
         label = QLabel(self)
@@ -20,6 +20,7 @@ class Button(QPushButton):
         label.setAlignment(Qt.AlignCenter)
         
         l = QLabel(word)
+        l.setWordWrap(True)
         l.setAlignment(Qt.AlignCenter)
         
         layout.addWidget(label)

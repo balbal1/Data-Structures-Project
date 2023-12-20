@@ -17,10 +17,11 @@ class MainWindow(QMainWindow):
         self.outputTextArea = QPlainTextEdit()
         self.outputTextArea.setReadOnly(True)
 
-        myClassFormat = QTextCharFormat()
-        myClassFormat.setForeground(Qt.red)
-        self.inputTextArea.setCurrentCharFormat(myClassFormat)
-        self.inputTextArea.insertPlainText("This is some red text.")                
+        # How to change font color in inputTextArea
+        # myClassFormat = QTextCharFormat()
+        # myClassFormat.setForeground(Qt.red)
+        # self.inputTextArea.setCurrentCharFormat(myClassFormat)
+        # self.inputTextArea.insertPlainText("This is some red text.")                
         
         openButton = Button("icons/OpenSymbol", "Open File")
         saveButton = Button("icons/SaveSymbol", "Save")
@@ -30,15 +31,13 @@ class MainWindow(QMainWindow):
         fixButton = Button("icons/FixSymbol", "Fix Errors")
         formatButton = Button("icons/FormatSymbol", "Prettify")
         convertButton = Button("icons/ConvertSymbol", "Convert")
-        compressButton = Button("icons/CompressSymbol", "Compress")
-        decompressButton = Button("icons/DecompressSymbol", "Decompress")
+        compressButton = Button("icons/CompressSymbol", "Save as compressed")
+        decompressButton = Button("icons/DecompressSymbol", "Open and decompress")
         
         formatButton.disabled = True
         convertButton.disabled = True
-        compressButton.disabled = True
         formatButton.setObjectName("disabled")
         convertButton.setObjectName("disabled")
-        compressButton.setObjectName("disabled")
         openButton.clicked.connect(self.openHandle)
         saveButton.clicked.connect(self.saveHandle)
         helpButton.clicked.connect(self.helpHandle)
@@ -76,11 +75,11 @@ class MainWindow(QMainWindow):
                 for line in file_in:
                     self.inputTextArea.insertPlainText(line)
     
-    def saveHandle(self, textArea, tree):
+    def saveHandle(self):
         path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'xml files (*.xml)')
         if path != ('', ''):
             file = open(path[0], 'w')
-            text = textArea.toPlainText()
+            text = self.textArea.toPlainText()
             file.write(text)
             file.close()
         
@@ -100,7 +99,7 @@ class MainWindow(QMainWindow):
     
     def decompressHandle(self):
         path = QFileDialog.getOpenFileName(self, 'Choose a file', '', 'comp files (*.comp)')
-        if self.path != ('', ''):
+        if path != ('', ''):
             text = decompress(path[0])
             self.inputTextArea.clear()
             self.inputTextArea.insertPlainText(text)
