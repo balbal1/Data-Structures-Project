@@ -3,6 +3,8 @@ from PySide2.QtGui import QIcon, QTextCharFormat, QFont, Qt
 import sys
 from Button import Button
 from compression import compress, decompress
+from errors_detection import error_detection
+from errors_correction import error_correction
 
 class MainWindow(QMainWindow):
     
@@ -42,9 +44,11 @@ class MainWindow(QMainWindow):
         saveButton.clicked.connect(self.saveHandle)
         helpButton.clicked.connect(self.helpHandle)
         closeButton.clicked.connect(self.closeHandle)
+        
+        fixButton.clicked.connect(self.fixHandle)
         compressButton.clicked.connect(self.compressHandle)
         decompressButton.clicked.connect(self.decompressHandle)
-        
+
         tabs = QTabWidget()
         tabs.setTabPosition(QTabWidget.North)
         tabs.addTab(self.buttonBarLayout([openButton, saveButton, helpButton, closeButton]), "file")
@@ -89,6 +93,13 @@ class MainWindow(QMainWindow):
     def closeHandle(self):
         sys.exit()
 
+    def fixHandle(self):
+        text = list(self.inputTextArea.toPlainText().split("\n"))
+        self.inputTextArea.clear()
+        text = error_correction(error_detection(text), text)
+        for line in text:
+            self.inputTextArea.insertPlainText(line + "\n")
+    
     def compressHandle(self):
         path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'comp files (*.comp)')
         if path != ('', ''):

@@ -1,10 +1,6 @@
 from PySide2.QtWidgets import QApplication
 import sys
 from MainWindow import MainWindow
-from errors_detection import error_detection
-
-#text=open_xml('sample.xml')
-#error_detection(text)
 
 app = QApplication(sys.argv)
 window = MainWindow()
