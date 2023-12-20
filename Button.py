@@ -6,6 +6,7 @@ class Button(QPushButton):
 
     clicked = Signal()
     hovered = Signal()
+    disabled = False
     
     def __init__(self, icon, word):
         super(Button, self).__init__()
@@ -30,7 +31,9 @@ class Button(QPushButton):
         self.setLayout(layout)
         
     def mousePressEvent(self,event):
-        self.clicked.emit()
+        if not self.disabled:
+            self.clicked.emit()
     
     def mouseMoveEvent(self,event):
-        self.hovered.emit()
+        if not self.disabled:
+            self.hovered.emit()
