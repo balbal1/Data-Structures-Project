@@ -19,12 +19,6 @@ class Node():
     def convert(self):
         pass
 
-    def compress(self):
-        pass
-
-    def decompress(self):
-        pass
-
     def print(self):
         for line in self.stringify():
             print(line)
