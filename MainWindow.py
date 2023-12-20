@@ -2,24 +2,25 @@ from PySide2.QtWidgets import QMainWindow, QWidget, QPushButton, QMessageBox, QV
 from PySide2.QtGui import QIcon, QTextCharFormat, QFont, Qt
 import sys
 from Button import Button
+from compression import compress, decompress
 
 class MainWindow(QMainWindow):
     
-    def __init__(self, tree):
+    def __init__(self):
         super(MainWindow, self).__init__()
-    
+
         self.setGeometry(400, 200, 1200, 800)
         self.setWindowTitle(" XML Editor")
         self.setWindowIcon(QIcon("icons/logo.png"))
-
-        inputTextArea = QPlainTextEdit()
-        outputTextArea = QPlainTextEdit()
-        outputTextArea.setReadOnly(True)
+        
+        self.inputTextArea = QPlainTextEdit()
+        self.outputTextArea = QPlainTextEdit()
+        self.outputTextArea.setReadOnly(True)
 
         myClassFormat = QTextCharFormat()
         myClassFormat.setForeground(Qt.red)
-        inputTextArea.setCurrentCharFormat(myClassFormat)
-        inputTextArea.insertPlainText("This is some red text.")
+        self.inputTextArea.setCurrentCharFormat(myClassFormat)
+        self.inputTextArea.insertPlainText("This is some red text.")                
         
         openButton = Button("icons/OpenSymbol", "Open File")
         saveButton = Button("icons/SaveSymbol", "Save")
@@ -30,6 +31,7 @@ class MainWindow(QMainWindow):
         formatButton = Button("icons/FormatSymbol", "Prettify")
         convertButton = Button("icons/ConvertSymbol", "Convert")
         compressButton = Button("icons/CompressSymbol", "Compress")
+        decompressButton = Button("icons/DecompressSymbol", "Decompress")
         
         formatButton.disabled = True
         convertButton.disabled = True
@@ -37,20 +39,21 @@ class MainWindow(QMainWindow):
         formatButton.setObjectName("disabled")
         convertButton.setObjectName("disabled")
         compressButton.setObjectName("disabled")
-
-        openButton.clicked.connect(lambda textArea=inputTextArea: self.openHandle(textArea, tree))
-        saveButton.clicked.connect(lambda textArea=inputTextArea: self.saveHandle(textArea, tree))
+        openButton.clicked.connect(self.openHandle)
+        saveButton.clicked.connect(self.saveHandle)
         helpButton.clicked.connect(self.helpHandle)
         closeButton.clicked.connect(self.closeHandle)
+        compressButton.clicked.connect(self.compressHandle)
+        decompressButton.clicked.connect(self.decompressHandle)
         
         tabs = QTabWidget()
         tabs.setTabPosition(QTabWidget.North)
         tabs.addTab(self.buttonBarLayout([openButton, saveButton, helpButton, closeButton]), "file")
-        tabs.addTab(self.buttonBarLayout([fixButton, formatButton, convertButton, compressButton]), "edit")
+        tabs.addTab(self.buttonBarLayout([fixButton, formatButton, convertButton, compressButton, decompressButton]), "edit")
         
         body = QHBoxLayout()
-        body.addWidget(inputTextArea)
-        body.addWidget(outputTextArea)
+        body.addWidget(self.inputTextArea)
+        body.addWidget(self.outputTextArea)
         body.setContentsMargins(10,10,10,10)
         
         layout = QVBoxLayout()
@@ -65,15 +68,14 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
         
         
-    def openHandle(self, textArea, tree):
+    def openHandle(self):
         path = QFileDialog.getOpenFileName(self, 'Choose a file', '', 'xml files (*.xml)')
         if path != ('', ''):
-            textArea.clear()
+            self.inputTextArea.clear()
             with open(path[0]) as file_in:
                 for line in file_in:
-                    textArea.insertPlainText(line)
-            tree.setTree(path[0])
-
+                    self.inputTextArea.insertPlainText(line)
+    
     def saveHandle(self, textArea, tree):
         path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'xml files (*.xml)')
         if path != ('', ''):
@@ -87,6 +89,21 @@ class MainWindow(QMainWindow):
     
     def closeHandle(self):
         sys.exit()
+
+    def compressHandle(self):
+        path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'comp files (*.comp)')
+        if path != ('', ''):
+            file = open(path[0], 'w')
+            text = compress(self.inputTextArea.toPlainText())
+            file.write(text)
+            file.close()
+    
+    def decompressHandle(self):
+        path = QFileDialog.getOpenFileName(self, 'Choose a file', '', 'comp files (*.comp)')
+        if self.path != ('', ''):
+            text = decompress(path[0])
+            self.inputTextArea.clear()
+            self.inputTextArea.insertPlainText(text)
     
     def buttonBarLayout(self, buttonArray):
         bar = QHBoxLayout()

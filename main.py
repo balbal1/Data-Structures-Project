@@ -6,7 +6,7 @@ from xmlTree import xmlTree
 tree = xmlTree()
 
 app = QApplication(sys.argv)
-window = MainWindow(tree)
+window = MainWindow()
 window.show()
 
 with open("style.qss", "r") as f:
