@@ -11,7 +11,7 @@ class GraphVisualization:
 		self.visual.append(edge) 
 		
 	def visualize(self): 
-		G = nx.Graph() 
+		G = nx.DiGraph() 
 		G.add_edges_from(self.visual) 
 		nx.draw_networkx(G) 
 		plt.show() 
@@ -20,6 +20,6 @@ class GraphVisualization:
 
 
 G = GraphVisualization() 
-for edge in mygraph.generate_edges():
+for edge in mygraph.edges:
     G.addEdge(edge) 
 G.visualize()
