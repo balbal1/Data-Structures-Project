@@ -1,10 +1,22 @@
 QPushButton {
 	background-color: rgb(245,246,247);
-	border: solid 1px yellow;
+	border: 2px solid rgb(245,246,247);
+	font-size: 18px;
 }
 
 QPushButton:hover {
-		background-color: rgb(212, 219, 237);
+	background-color: rgb(215, 226, 255);
+	border: 2px solid rgb(147, 190, 234);
+}
+
+
+QPushButton::menu-indicator{
+	width:0px;
+}
+
+#disabled {
+	background-color: rgb(170, 170, 170);
+	border: 0px;
 }
 
 #bars {
@@ -17,4 +29,9 @@ QPushButton:hover {
 
 QWidget {
 	font-size: 16px;
+}
+
+QComboBox {
+	background-color: transparent;
+	text-align: center;
 }
