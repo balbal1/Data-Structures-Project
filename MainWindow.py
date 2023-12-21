@@ -2,6 +2,7 @@ from PySide2.QtWidgets import QMainWindow, QWidget, QPushButton, QMessageBox, QV
 from PySide2.QtGui import QIcon, QTextCharFormat, QFont, Qt
 import sys
 from Button import Button, DoubleButton
+from Node import Node
 from compression import compress, decompress
 from errors_detection import error_detection
 from errors_correction import error_correction
@@ -15,15 +16,11 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(" XML Editor")
         self.setWindowIcon(QIcon("icons/logo.png"))
         
+        self.tree = None
+
         self.inputTextArea = QPlainTextEdit()
         self.outputTextArea = QPlainTextEdit()
-        self.outputTextArea.setReadOnly(True)
-
-        # How to change font color in inputTextArea
-        # myClassFormat = QTextCharFormat()
-        # myClassFormat.setForeground(Qt.red)
-        # self.inputTextArea.setCurrentCharFormat(myClassFormat)
-        # self.inputTextArea.insertPlainText("This is some red text.")                
+        self.outputTextArea.setReadOnly(True)               
         
         openButton = DoubleButton("icons/OpenSymbol", "Open", ["Open\r\nXML", "Open\nCompressed"])
         saveButton = DoubleButton("icons/SaveSymbol", "Save", ["Save\nas XML", "Save as\nCompressed"])
@@ -32,30 +29,34 @@ class MainWindow(QMainWindow):
         
         showButton = Button("icons/ShowSymbol", "Show Errors")
         fixButton = Button("icons/FixSymbol", "Fix Errors")
+        prettifyButton = Button("icons/FormatSymbol", "Prettify")
         minifyButton = Button("icons/MinifySymbol", "Minify")
-        formatButton = Button("icons/FormatSymbol", "Prettify")
         convertButton = Button("icons/ConvertSymbol", "Convert")
         
+        prettifyButton.disabled = True
         minifyButton.disabled = True
-        formatButton.disabled = True
         convertButton.disabled = True
+        prettifyButton.setObjectName("disabled")
         minifyButton.setObjectName("disabled")
-        formatButton.setObjectName("disabled")
         convertButton.setObjectName("disabled")
+
         openButton.clicked_normal.connect(self.openHandle)
         openButton.clicked_compressed.connect(self.decompressHandle)
         saveButton.clicked_normal.connect(self.saveHandle)
         saveButton.clicked_compressed.connect(self.compressHandle)
         helpButton.clicked.connect(self.helpHandle)
         closeButton.clicked.connect(self.closeHandle)
-        
+
         showButton.clicked.connect(self.showHandle)
         fixButton.clicked.connect(self.fixHandle)
+        prettifyButton.clicked.connect(self.prettifyHandle)
+        minifyButton.clicked.connect(self.minifyHandle)
+        convertButton.clicked.connect(self.convertHandle) 
 
         tabs = QTabWidget()
         tabs.setTabPosition(QTabWidget.North)
         tabs.addTab(self.buttonBarLayout([openButton, saveButton, helpButton, closeButton]), "file")
-        tabs.addTab(self.buttonBarLayout([showButton, fixButton, minifyButton, formatButton, convertButton]), "edit")
+        tabs.addTab(self.buttonBarLayout([showButton, fixButton, prettifyButton, minifyButton, convertButton]), "edit")
         
         body = QHBoxLayout()
         body.addWidget(self.inputTextArea)
@@ -72,7 +73,6 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
         widget.setObjectName("body")
         self.setCentralWidget(widget)
-        
         
     def openHandle(self):
         path = QFileDialog.getOpenFileName(self, 'Choose a file', '', 'xml files (*.xml)')
@@ -95,6 +95,18 @@ class MainWindow(QMainWindow):
     
     def closeHandle(self):
         sys.exit()
+
+    def prettifyHandle(self):
+        self.outputTextArea.clear()
+        self.outputTextArea.insertPlainText(self.tree.prettify())
+
+    def minifyHandle(self):
+        self.outputTextArea.clear()
+        self.outputTextArea.insertPlainText(self.tree.minify())
+
+    def convertHandle(self):
+        self.outputTextArea.clear()
+        self.outputTextArea.insertPlainText(self.tree.convert(False, True))
 
     def showHandle(self):
         text = list(self.inputTextArea.toPlainText().split("\n"))

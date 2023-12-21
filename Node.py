@@ -11,7 +11,10 @@ class Node():
         return root
 
     def prettify(self):
-        pass
+        string = ""
+        for line in self.stringify():
+            string += line + "\n"
+        return string
 
     def minify(self):
         if self.children == []:
@@ -22,8 +25,28 @@ class Node():
         string += "</" + self.name + ">"
         return string
 
-    def convert(self):
-        pass
+    def convert(self, isArray, isRoot = False):
+        if isRoot:
+            return "{\n" + self.convert(False)[:-2] + "\n}"
+
+        string = "  " * (self.level + 1)
+        if not isArray:
+            string += "\"" + self.name + "\": "
+        
+        if self.children == []:
+            return string + "\"" + str(self.text) + "\",\n"
+        
+        if len(self.children) > 1 and self.name[-1] == "s":
+            isArray = True
+            brackets = ["[", "]"]
+        else:
+            isArray = False
+            brackets = ["{", "}"]
+
+        string += brackets[0] + "\n"
+        for child in self.children:
+            string += child.convert(isArray)
+        return string[:-2] + "\n" + "  " * (self.level + 1) + brackets[1] + ",\n"
 
     def print(self):
         for line in self.stringify():
@@ -51,9 +74,3 @@ class Node():
         self.name = "teams"
         self.children = [team]
         self.level = 0
-
-   
-
-myTree = Node()
-myTree.getTest()
-myTree.print()
