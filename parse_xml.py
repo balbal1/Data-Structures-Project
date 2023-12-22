@@ -7,7 +7,6 @@ class TreeNode:
 def parse_xml(xml_content):
 
     root = build_tree_from_xml(xml_content)
-
     return root
 
 def build_tree_from_xml(xml_content):
@@ -69,7 +68,6 @@ def build_tree_from_xml(xml_content):
             i -= 1  # Move back one step to process the opening tag in the next iteration
 
         i += 1  # Move to the next character
-
     return current_node
 
 def print_tree(node, indent=0):
