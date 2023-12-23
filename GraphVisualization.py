@@ -19,7 +19,7 @@ class GraphVisualization:
 
 
 
-G = GraphVisualization() 
+g = GraphVisualization() 
 for edge in mygraph.edges:
-    G.addEdge(edge) 
-G.visualize()
+    g.addEdge(edge) 
+g.visualize()
