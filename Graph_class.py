@@ -66,6 +66,19 @@ class Graph:
                 most=len(self.following(v))
                 influencer=v          
         return influencer
+    
+    def mutual_followers(self,user1,user2):
+        if user1 not in self.vertices:
+            print("Vertex ", user1, " does not exist.")
+        elif user2 not in self.vertices:
+            print("Vertex ", user2, " does not exist.")
+        followers1=self.followers(user1)
+        followers2=self.followers(user2)
+        mutual=[]
+        for f in followers1:
+            if f in followers2:
+                mutual.append(f)
+        return mutual
 
 
     def print(self):
@@ -85,8 +98,8 @@ mygraph.add_vertex('3')
 mygraph.add_vertex('4')
 mygraph.add_edge('1','2')
 mygraph.add_edge('1','3')
-mygraph.add_edge('1','1')
-mygraph.add_edge('3','3')
+mygraph.add_edge('4','2')
+mygraph.add_edge('4','3')
 mygraph.print()
-print(mygraph.most_influencer())
+print(mygraph.mutual_followers('2','3'))
 
