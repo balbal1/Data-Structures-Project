@@ -7,7 +7,7 @@ class Graph:
 
     def add_vertex(self,v):
         if v in self.vertices:
-            return f'Vertex {v} already exists'
+            print('Vertex',v,'already exists')
         else:
             self.vertices_no +=1
             self.vertices.append(v)
@@ -32,9 +32,29 @@ class Graph:
             self.graph[index1][index2] = 1
 
 
+    def followers(self,v):
+        followers=[] 
+        if v not in self.vertices:
+            print("Vertex ", v, " does not exist.")
+        for edge in self.edges:
+            if edge[1] == v :
+                followers.append(edge[0])
+        return followers
+    
+
+    def most_influencer(self):
+        most=0
+        for v in self.vertices:
+            if most< len(self.followers(v)):
+                most=len(self.followers(v))
+                influencer=v          
+        return influencer
+
+
     def print(self):
         for edge in self.edges:
             print(edge[0],'--->',edge[1])   
+
 
     def matrix(self):
         return self.graph
@@ -46,10 +66,10 @@ mygraph.add_vertex('1')
 mygraph.add_vertex('2')
 mygraph.add_vertex('3')
 mygraph.add_vertex('4')
-mygraph.add_edge('1','3')
-mygraph.add_edge('1','4')
-mygraph.add_edge('4','3')
-mygraph.add_edge('3','2')
+mygraph.add_edge('1','2')
+mygraph.add_edge('1','2')
+mygraph.add_edge('4','2')
+mygraph.add_edge('3','3')
 mygraph.print()
-print(mygraph.matrix())
+print(mygraph.most_influencer())
 
