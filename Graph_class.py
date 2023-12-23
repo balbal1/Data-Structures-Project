@@ -41,12 +41,29 @@ class Graph:
                 followers.append(edge[0])
         return followers
     
+    def following(self,v):
+        following=[] 
+        if v not in self.vertices:
+            print("Vertex ", v, " does not exist.")
+        for edge in self.edges:
+            if edge[0] == v :
+                following.append(edge[1])
+        return following
+    
 
     def most_influencer(self):
         most=0
         for v in self.vertices:
             if most< len(self.followers(v)):
                 most=len(self.followers(v))
+                influencer=v          
+        return influencer
+    
+    def most_active(self):
+        most=0
+        for v in self.vertices:
+            if most< len(self.following(v)):
+                most=len(self.following(v))
                 influencer=v          
         return influencer
 
@@ -67,8 +84,8 @@ mygraph.add_vertex('2')
 mygraph.add_vertex('3')
 mygraph.add_vertex('4')
 mygraph.add_edge('1','2')
-mygraph.add_edge('1','2')
-mygraph.add_edge('4','2')
+mygraph.add_edge('1','3')
+mygraph.add_edge('1','1')
 mygraph.add_edge('3','3')
 mygraph.print()
 print(mygraph.most_influencer())
