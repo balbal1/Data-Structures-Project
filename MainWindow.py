@@ -116,17 +116,22 @@ class MainWindow(QMainWindow):
         for i, line in enumerate(text):
             myClassFormat.setForeground(Qt.black)
             for error in errors:
-                if error[0] == i+1 and error[1] != "Valid":
+                if error[0] == i and error[1] != "Valid":
                     myClassFormat.setForeground(Qt.red)
             self.inputTextArea.setCurrentCharFormat(myClassFormat)
             self.inputTextArea.insertPlainText(line + "\n")
+        self.inputTextArea.textCursor().deletePreviousChar()
 
     def fixHandle(self):
         text = list(self.inputTextArea.toPlainText().split("\n"))
         self.inputTextArea.clear()
         text = error_correction(error_detection(text), text)
+        myClassFormat = QTextCharFormat()
+        myClassFormat.setForeground(Qt.black)
+        self.inputTextArea.setCurrentCharFormat(myClassFormat)
         for line in text:
             self.inputTextArea.insertPlainText(line + "\n")
+        self.inputTextArea.textCursor().deletePreviousChar()
     
     def compressHandle(self):
         path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'comp files (*.comp)')
