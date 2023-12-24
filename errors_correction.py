@@ -24,12 +24,15 @@ def error_correction(tags, xml_file):
 # Returns None in case the tag_line tag_line < 0 else returns tag_line
 def find_open_tag_insert_line(tag_line, xml_file):
     # Find the appropriate line number to insert the open tag
-    tag_line -= 1
+    # tag_line -= 1
 
     #Decrement the line number as long as the line contains just text
-    while tag_line >= 0 and not xml_file[tag_line].strip().rstrip()[-1] == '>': 
+    while tag_line > 0:
+        line_content = xml_file[tag_line-1].strip().rstrip()
+        if line_content and line_content[-1] == '>': 
+            return tag_line
         tag_line -= 1
-    return tag_line + 1 if tag_line >= 0 else None
+    return None
 
 # Returns None in case the tag_line tag_line > len(xml_file) else returns tag_line
 def find_close_tag_insert_line(tag_line, xml_file):

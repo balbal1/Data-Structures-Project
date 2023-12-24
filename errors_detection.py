@@ -14,7 +14,7 @@ def error_detection(xml_file):
     for i in range(len(xml_file)):
         matches = re.finditer(filter, xml_file[i])
         for match in matches:
-            tag_info = [i + 1, match.group(1)]
+            tag_info = [i, match.group(1)]
             tags_list.append(tag_info)
 
     # Detect errors
@@ -34,7 +34,7 @@ def error_detection(xml_file):
                     updateTags(tag_line, 'Valid', openStack[-1][1])
                     openStack.pop()
                 else:
-                    updateTags(openStack[-1][0], 'Missing open tag', closeTag)
+                    updateTags(tag_line, 'Missing open tag', closeTag)
             else:
                 updateTags(tag_line, 'Missing open tag', closeTag)
 
