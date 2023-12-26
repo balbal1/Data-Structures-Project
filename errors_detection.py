@@ -17,6 +17,8 @@ def error_detection(xml_file):
             tag_info = [i + 1, match.group(1)]
             tags_list.append(tag_info)
 
+    if tags_list == []:
+        return None
     # Detect errors
     for tag in tags_list:
         if not tag[1].startswith('/'):  # open Tag
@@ -26,12 +28,10 @@ def error_detection(xml_file):
             tag_line = tag[0]
             if openStack != []:
                 if closeTag == openStack[-1][1]:
-                    updateTags(tag_line, 'Valid', openStack[-1][1])
                     openStack.pop()
                 elif len(openStack) > 1 and closeTag == openStack[-2][1]:
                     updateTags(openStack[-1][0], 'Missing Close tag', openStack[-1][1])
                     openStack.pop()
-                    updateTags(tag_line, 'Valid', openStack[-1][1])
                     openStack.pop()
                 else:
                     updateTags(openStack[-1][0], 'Missing open tag', closeTag)
