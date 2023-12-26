@@ -1,92 +1,73 @@
-class TreeNode:
-    def __init__(self, tag, text=""):
-        self.tag = tag
-        self.text = text
-        self.children = []
+class Node:
+    def __init__(self, name: str, tag_open: bool = False):
+        self.name = name
+        self.tag_open = tag_open
+        self.child = []
 
-def parse_xml(xml_content):
+def xml2tree(s: str) -> Node:
+    stack = []
 
-    root = build_tree_from_xml(xml_content)
+    def is_empty() -> bool:
+        return len(stack) == 0
+
+    def push(n: Node):
+        stack.append(n)
+
+    def pop():
+        stack.pop()
+
+    def peek() -> Node:
+        return stack[-1]
+
+    root = None
+    i = 0
+    while i < len(s):
+        if s[i] == '<':
+            start = i
+            i += 1
+            while i < len(s) and s[i] != '>':
+                i += 1
+            if i < len(s) and s[i] == '>':
+                tag = s[start + 1:i]
+                if tag.startswith('/'):
+                    if not is_empty() and peek().tag_open and tag[1:] == peek().name:
+                        pop()
+                else:
+                    n = Node(tag, tag_open=True)
+                    if root is None:
+                        root = n
+                    else:
+                        peek().child.append(n)
+                    push(n)
+                i += 1
+            else:
+                raise ValueError("Invalid XML syntax")
+        else:
+            start = i
+            while i < len(s) and s[i] != '<':
+                i += 1
+            data = s[start:i].strip()
+            if data:
+                n = Node(data)
+                peek().child.append(n)
     return root
 
-def build_tree_from_xml(xml_content):
-    stack = []
-    current_node = None
+def print_tree(r: Node, level: int = 0) -> None:
+    def tab():
+        for i in range(level):
+            print("  ", end="")
 
-    i = 0
-    while i < len(xml_content):
-        if xml_content[i] == '<':
-            if xml_content[i + 1] == '/':
-                # Closing tag
-                i += 2  # Move past '</'
-                end_tag_start = i
-                while xml_content[i] != '>':
-                    i += 1
-                end_tag = xml_content[end_tag_start:i]
-                if stack:
-                    current_node = stack.pop()
-            elif xml_content[i + 1] == '?':
-                # XML declaration, skip
-                while xml_content[i:i + 2] != '?>':
-                    i += 1
-                i += 2  # Move past '?>'
-            elif xml_content[i + 1] == '!':
-                # Skip comments or CDATA
-                while xml_content[i:i + 3] != ']]>' and xml_content[i:i + 2] != '--':
-                    i += 1
-                i += 3 if xml_content[i:i + 3] == ']]>' else 2
-            elif xml_content[i + 1] == '/':
-                # Closing tag of self-closing tag, skip
-                i += 2  # Move past '</'
-                while xml_content[i] != '>':
-                    i += 1
-                i += 1  # Move past '>'
-                if stack:
-                    current_node = stack.pop()
-            else:
-                # Opening tag
-                i += 1  # Move past '<'
-                start_tag_start = i
-                while xml_content[i] != '>':
-                    i += 1
-                start_tag = xml_content[start_tag_start:i]
-                node = TreeNode(start_tag)
-                if current_node is not None:
-                    current_node.children.append(node)
-                    stack.append(current_node)
-                current_node = node
-        else:
-            # Text content
-            text_start = i
-            while i < len(xml_content) and xml_content[i] != '<':
-                i += 1
-            text = xml_content[text_start:i].strip()
-            if text:
-                node = TreeNode(text)
-                if current_node is not None:
-                    current_node.children.append(node)
-            i -= 1  # Move back one step to process the opening tag in the next iteration
-
-        i += 1  # Move to the next character
-    return current_node
-
-def print_tree(node, indent=0):
-    # Print opening tag for the root
-    if node.tag:
-        print("  " * indent + f"<{node.tag}>{node.text}")
-
-    # Recursively print children
-    for child in node.children:
-        print_tree(child, indent + 1)
-
-    # Print closing tag for the root if it has children
-    if node.children and node.tag:
-        print("  " * indent + f"</{node.tag}>")
+    level += 1
+    tab()
+    print(f"{r.name}({level})")
+    for child in r.child:
+        print_tree(child, level)
+    level -= 1
 
 # Example:
 if __name__ == "__main__":
     with open("sample.xml", 'r') as file:
         xml_content = file.read()
 
-    parsed_tree = parse_xml(xml_content)
+    parsed_tree = xml2tree(xml_content)
     print_tree(parsed_tree)
