@@ -5,8 +5,8 @@ def error_detection(xml_file):
     openStack = []
     tags = []  # line: , status: correct/missing tag
 
-    def updateTags(line, status, name,previous_errors_count):
-        tag_info = [line, status, name, previous_errors_count]
+    def updateTags(line, status, name):
+        tag_info = [line, status, name]
         tags.append(tag_info)
 
     # Get the tags and their corresponding line
@@ -25,17 +25,15 @@ def error_detection(xml_file):
             tag_line = tag[0]
             if openStack != []:
                 if closeTag == openStack[-1][1]:
-                    #updateTags(tag_line, 'Valid', openStack[-1][1])
                     openStack.pop()
                 elif len(openStack) > 1 and closeTag == openStack[-2][1]:
-                    updateTags(openStack[-1][0], 'Missing Close tag', openStack[-1][1],len(tags))
-                    openStack.pop()
-                    # updateTags(tag_line, 'Valid', openStack[-1][1])
-                    openStack.pop()
+                    updateTags(openStack[-1][0], 'Missing Close tag', openStack[-1][1])
+                    openStack.pop() # pop the wrong tag
+                    openStack.pop() # pop the right tag
                 else:
-                    updateTags(tag_line, 'Missing open tag', closeTag,len(tags))
+                    updateTags(tag_line, 'Missing open tag', closeTag)
             else:
-                updateTags(tag_line, 'Missing open tag', closeTag,len(tags))
+                updateTags(tag_line, 'Missing open tag', closeTag)
 
         closeTag = ''
         tag_line = 0
