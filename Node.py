@@ -1,9 +1,9 @@
 class Node():
 
-    def __init__(self, name = "", text = "", children = [], level = 0):
+    def __init__(self, name = "", text = "", level = 0):
         self.name = name
         self.text = text
-        self.children = children
+        self.children = []
         self.level = level
     
     def buildTree(self):
