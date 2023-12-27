@@ -6,6 +6,7 @@ from parse_xml import xml2tree
 from compression import compress, decompress
 from errors_detection import error_detection
 from errors_correction import error_correction
+from GraphWindow import GraphWindow
 
 class MainWindow(QMainWindow):
     
@@ -32,15 +33,18 @@ class MainWindow(QMainWindow):
         self.prettifyButton = Button("icons/FormatSymbol", "Prettify")
         self.minifyButton = Button("icons/MinifySymbol", "Minify")
         self.convertButton = Button("icons/ConvertSymbol", "Convert")
+        self.visualizeButton = Button("icons/VisualizeSymbol", "Visualize Network", 10)
         
+        self.fixButton.disabled = True
         self.prettifyButton.disabled = True
         self.minifyButton.disabled = True
         self.convertButton.disabled = True
-        self.fixButton.disabled = True
+        self.visualizeButton.disabled = True
+        self.fixButton.setObjectName("disabled")
         self.prettifyButton.setObjectName("disabled")
         self.minifyButton.setObjectName("disabled")
         self.convertButton.setObjectName("disabled")
-        self.fixButton.setObjectName("disabled")
+        self.visualizeButton.setObjectName("disabled")
 
         self.openButton.clicked_normal.connect(self.openHandle)
         self.openButton.clicked_compressed.connect(self.decompressHandle)
@@ -54,11 +58,12 @@ class MainWindow(QMainWindow):
         self.prettifyButton.clicked.connect(self.prettifyHandle)
         self.minifyButton.clicked.connect(self.minifyHandle)
         self.convertButton.clicked.connect(self.convertHandle) 
+        self.visualizeButton.clicked.connect(self.visualizeHandle) 
 
         self.tabs = QTabWidget()
         self.tabs.setTabPosition(QTabWidget.North)
         self.tabs.addTab(self.buttonBarLayout([self.openButton, self.saveButton, self.helpButton, self.closeButton]), "file")
-        self.tabs.addTab(self.buttonBarLayout([self.showButton, self.fixButton, self.prettifyButton, self.minifyButton, self.convertButton]), "edit")
+        self.tabs.addTab(self.buttonBarLayout([self.showButton, self.fixButton, self.prettifyButton, self.minifyButton, self.convertButton, self.visualizeButton]), "edit")
         
         body = QHBoxLayout()
         body.addWidget(self.inputTextArea)
@@ -149,6 +154,13 @@ class MainWindow(QMainWindow):
             self.openButtons()
             self.tree = xml2tree(self.inputTextArea.toPlainText())
     
+    def visualizeHandle(self):
+        self.graphWindow = GraphWindow()
+        self.graphWindow.show()
+        with open("graphStyle.qss", "r") as f:
+            _style = f.read()
+            self.graphWindow.setStyleSheet(_style)
+
     def compressHandle(self):
         path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'comp files (*.comp)')
         if path != ('', ''):
@@ -170,11 +182,13 @@ class MainWindow(QMainWindow):
         self.prettifyButton.disabled = False
         self.minifyButton.disabled = False
         self.convertButton.disabled = False
+        self.visualizeButton.disabled = False
         self.showButton.setObjectName("disabled")
         self.fixButton.setObjectName("disabled")
         self.prettifyButton.setObjectName("enabled")
         self.minifyButton.setObjectName("enabled")
         self.convertButton.setObjectName("enabled")
+        self.visualizeButton.setObjectName("enabled")
         self.updateTabs()
 
     def closeButtons(self):
@@ -183,17 +197,19 @@ class MainWindow(QMainWindow):
         self.prettifyButton.disabled = True
         self.minifyButton.disabled = True
         self.convertButton.disabled = True
+        self.visualizeButton.disabled = True
         self.showButton.setObjectName("enabled")
         self.fixButton.setObjectName("disabled")
         self.prettifyButton.setObjectName("disabled")
         self.minifyButton.setObjectName("disabled")
         self.convertButton.setObjectName("disabled")
+        self.visualizeButton.setObjectName("disabled")
         self.updateTabs()
 
     def updateTabs(self):
         i = self.tabs.currentIndex()
         self.tabs.removeTab(1)
-        self.tabs.addTab(self.buttonBarLayout([self.showButton, self.fixButton, self.prettifyButton, self.minifyButton, self.convertButton]), "edit")
+        self.tabs.addTab(self.buttonBarLayout([self.showButton, self.fixButton, self.prettifyButton, self.minifyButton, self.convertButton, self.visualizeButton]), "edit")
         if i == 1:
             self.tabs.setCurrentIndex(1)
 

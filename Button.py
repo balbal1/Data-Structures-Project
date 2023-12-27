@@ -8,20 +8,20 @@ class Button(QPushButton):
     hovered = Signal()
     disabled = False
     
-    def __init__(self, icon, word):
+    def __init__(self, icon, word, offset = 0):
         super(Button, self).__init__()
         
         self.setMinimumSize(100,120)
         layout = QVBoxLayout(self)
         
         image = QLabel()
-        image.setFixedSize(100, 70)
-        pixmap = QPixmap(icon).scaledToWidth(70)
+        image.setFixedSize(100, 70 - offset)
+        pixmap = QPixmap(icon).scaledToWidth(70 - offset)
         image.setPixmap(pixmap)
         image.setAlignment(Qt.AlignCenter)
         
         text = QLabel(word)
-        text.setFixedSize(100, 30)
+        text.setFixedSize(100, 40 + offset)
         text.setWordWrap(True)
         text.setAlignment(Qt.AlignCenter)
         

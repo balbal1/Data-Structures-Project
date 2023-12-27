@@ -1,0 +1,40 @@
+#body {
+	background-color: rgb(255,255,255);
+}
+
+#toolbar {
+	background-color: rgb(245,246,247);
+	border: 2px solid rgba(167, 167, 167, 255);
+}
+
+QPushButton {
+	background-color: rgba(209, 209, 209, 255);
+	border: 2px solid rgb(245,246,247);
+	font-size: 20px;
+}
+
+QPushButton:hover {
+	background-color: rgb(215, 226, 255);
+	border: 2px solid rgb(147, 190, 234);
+}
+
+QVBoxLayout {
+	border: 2px solid rgb(147, 190, 234);
+}
+
+QWidget {
+	font-size: 20px;
+}
+
+#mainTitle {
+	font-size: 24px;
+	font-weight: bold;
+}
+
+#title {
+	font-size: 22px;
+}
+
+QComboBox {
+	text-align: center;
+}
