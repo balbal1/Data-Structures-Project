@@ -31,10 +31,10 @@ def error_detection(xml_file):
                     openStack.pop()
                 elif len(openStack) > 1 and closeTag == openStack[-2][1]:
                     updateTags(openStack[-1][0], 'Missing Close tag', openStack[-1][1])
-                    openStack.pop()
-                    openStack.pop()
+                    openStack.pop() # pop the wrong tag
+                    openStack.pop() # pop the right tag
                 else:
-                    updateTags(openStack[-1][0], 'Missing open tag', closeTag)
+                    updateTags(tag_line, 'Missing open tag', closeTag)
             else:
                 updateTags(tag_line, 'Missing open tag', closeTag)
 
@@ -43,7 +43,7 @@ def error_detection(xml_file):
 
     if openStack != []:
         while openStack != []:
-            updateTags(openStack[-1][0], 'Missing Close tag', openStack[-1][1])
+            updateTags(openStack[-1][0]+1, 'Missing Close tag', openStack[-1][1],len(tags))
             openStack.pop()
 
     return tags
