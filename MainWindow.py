@@ -80,6 +80,7 @@ class MainWindow(QMainWindow):
         path = QFileDialog.getOpenFileName(self, 'Choose a file', '', 'xml files (*.xml)')
         if path != ('', ''):
             self.inputTextArea.clear()
+            self.outputTextArea.clear()
             with open(path[0]) as file_in:
                 for line in file_in:
                     self.inputTextArea.insertPlainText(line)
@@ -88,7 +89,7 @@ class MainWindow(QMainWindow):
         path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'xml files (*.xml)')
         if path != ('', ''):
             file = open(path[0], 'w')
-            text = self.textArea.toPlainText()
+            text = self.inputTextArea.toPlainText()
             file.write(text)
             file.close()
         
@@ -124,7 +125,7 @@ class MainWindow(QMainWindow):
             for i, line in enumerate(text):
                 myClassFormat.setForeground(Qt.black)
                 for error in errors:
-                    if error[0] == i+1 and error[1] != "Valid":
+                    if error[0] == i and error[1] != "Valid":
                         myClassFormat.setForeground(Qt.red)
                 self.inputTextArea.setCurrentCharFormat(myClassFormat)
                 self.inputTextArea.insertPlainText(line + "\n")
@@ -135,13 +136,18 @@ class MainWindow(QMainWindow):
 
     def fixHandle(self):
         text = list(self.inputTextArea.toPlainText().split("\n"))
-        self.inputTextArea.clear()
         text = error_correction(error_detection(text), text)
+        errors = error_detection(text)
+        self.inputTextArea.clear()
+        myClassFormat = QTextCharFormat()
+        myClassFormat.setForeground(Qt.black)
+        self.inputTextArea.setCurrentCharFormat(myClassFormat)
         for line in text:
             self.inputTextArea.insertPlainText(line + "\n")
         self.inputTextArea.textCursor().deletePreviousChar()
-        self.openButtons()
-        self.tree = xml2tree(self.inputTextArea.toPlainText())
+        if errors == []:
+            self.openButtons()
+            self.tree = xml2tree(self.inputTextArea.toPlainText())
     
     def compressHandle(self):
         path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'comp files (*.comp)')
