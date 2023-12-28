@@ -38,3 +38,7 @@ QWidget {
 QComboBox {
 	text-align: center;
 }
+
+#post {
+	border: 2px solid rgba(167, 167, 167, 255);
+}

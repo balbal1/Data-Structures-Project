@@ -1,5 +1,7 @@
-from PySide2.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QComboBox, QLineEdit, QMessageBox, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QTabWidget, QFileDialog
-from PySide2.QtGui import QIcon, QTextCharFormat, QFont, Qt, QPixmap
+from PySide2.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QComboBox, QLineEdit, QScrollArea, QVBoxLayout, QHBoxLayout
+from PySide2.QtGui import QIcon, QPixmap
+from Post import Post
+from Graph_class import Graph
 
 class GraphWindow(QMainWindow):
     
@@ -9,8 +11,10 @@ class GraphWindow(QMainWindow):
         self.setGeometry(400, 200, 1200, 800)
         self.setWindowTitle(" Graph Viewer")
         self.setWindowIcon(QIcon("icons/logo.png"))
-        self.graph = None
+        self.graph = Graph()
 
+        self.graph.makeGraph()
+        self.graph.visualize([])
         graphmap = QPixmap("graph.png")
         self.graphImage = QLabel()
         self.graphImage.setPixmap(graphmap)
@@ -73,12 +77,12 @@ class GraphWindow(QMainWindow):
         searchTools.addWidget(searchBar, 0)
         searchTools.addWidget(searchButton, 1)
         
-        searchResults = QVBoxLayout()
+        self.searchResults = QScrollArea()
         
         searchBox = QVBoxLayout()
         searchBox.addLayout(searchTools, 0)
         searchBox.addStretch()
-        searchBox.addLayout(searchResults, 1)
+        searchBox.addWidget(self.searchResults, 1)
         searchBox.addStretch()
 
         upperWidget = QWidget()
@@ -105,13 +109,52 @@ class GraphWindow(QMainWindow):
         self.toolBar.addWidget(upperWidget, 0)
         self.toolBar.addWidget(lowerWidget, 1)
 
-        layout = QHBoxLayout()
-        layout.addLayout(self.toolBar, 0)
-        layout.addWidget(self.graphImage, 1)
-        layout.setContentsMargins(10,10,10,10)
-        layout.addStretch()
+        self.layout = QHBoxLayout()
+        self.layout.addLayout(self.toolBar, 0)
+        self.layout.addWidget(self.graphImage, 1)
+        self.layout.setContentsMargins(10,10,10,10)
+        self.layout.addStretch()
         
+        influencerButton.clicked.connect(self.influencerHandle)
+        activeButton.clicked.connect(self.activeHandle)
+        mutualButton.clicked.connect(self.mutualHandle)
+        suggestButton.clicked.connect(self.suggestHandle)
+        searchButton.clicked.connect(self.searchHandle)
+
         widget = QWidget()
-        widget.setLayout(layout)
+        widget.setLayout(self.layout)
         widget.setObjectName("body")
         self.setCentralWidget(widget)
+    
+    def influencerHandle(self):
+        self.graph.visualize(['5'])
+        graphmap = QPixmap("graph.png")
+        self.graphImage.setPixmap(graphmap)
+
+    def activeHandle(self):
+        self.graph.visualize(['3'])
+        graphmap = QPixmap("graph.png")
+        self.graphImage.setPixmap(graphmap)
+
+    def mutualHandle(self):
+        self.graph.visualize(['2', '4'])
+        graphmap = QPixmap("graph.png")
+        self.graphImage.setPixmap(graphmap)
+
+    def suggestHandle(self):
+        self.graph.visualize(['1', '3', '4'])
+        graphmap = QPixmap("graph.png")
+        self.graphImage.setPixmap(graphmap)
+
+    def searchHandle(self):
+        posts = [["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", "Ahmed Ali", ["economy", "finance"]],
+                 ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", "Ahmed Ali", ["solar_energy"]],
+                 ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", "Yasser Ahmed", ["education"]],
+                 ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", "Mohamed Sherif", ["sports"]]]
+        layout = QVBoxLayout()
+        for post in posts:
+            post = Post(post[0], post[1], post[2])
+            layout.addWidget(post)
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.searchResults.setWidget(widget)

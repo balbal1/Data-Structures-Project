@@ -1,3 +1,7 @@
+import networkx as nx 
+import matplotlib.pyplot as plt 
+import numpy
+
 class Graph:
     def __init__(self):
         self.graph=[]
@@ -106,23 +110,27 @@ class Graph:
     def matrix(self):
         return self.graph
     
+    def visualize(self, v): 
+        G = nx.DiGraph() 
+        G.add_edges_from(self.edges) 
+        numpy.random.seed(50)
+        nx.draw_networkx(G, font_size=22, node_size=1000, width=3, arrowsize=20, node_color=['red' if (node_name in v)  else 'blue' for node_name in list(G.nodes)])
+        plt.savefig("graph.png")
+        plt.clf()
+    
 
-
-mygraph=Graph()
-mygraph.add_vertex('1')
-mygraph.add_vertex('2')
-mygraph.add_vertex('3')
-mygraph.add_vertex('4')
-mygraph.add_vertex('5')
-mygraph.add_edge('2','1')
-mygraph.add_edge('3','1')
-mygraph.add_edge('4','2')
-mygraph.add_edge('1','2')
-mygraph.add_edge('3','2')
-mygraph.add_edge('5','3')
-mygraph.add_edge('5','4')
-mygraph.add_edge('1','5')
-print(mygraph.print())
-print(mygraph.suggest_tofollow('1'))
-print(mygraph.suggest_foreach_user())
+    def makeGraph(self):
+        self.add_vertex('1')
+        self.add_vertex('2')
+        self.add_vertex('3')
+        self.add_vertex('4')
+        self.add_vertex('5')
+        self.add_edge('2','1')
+        self.add_edge('3','1')
+        self.add_edge('4','2')
+        self.add_edge('1','2')
+        self.add_edge('3','2')
+        self.add_edge('5','3')
+        self.add_edge('5','4')
+        self.add_edge('1','5')
 
