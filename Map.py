@@ -5,8 +5,8 @@ BLACK = "black"
 class Map:
     # Public Interface
 
-    def put(self, key, value):
-        self.root = self._put(self.root, key, value)
+    def put(self, key, value, replace=True):
+        self.root = self._put(self.root, key, value, replace)
 
     def get(self, key):        
         node = self.root
@@ -52,7 +52,7 @@ class Map:
     class TNode:
         def __init__(self, key, value, color):
             self.key = key
-            self.value = value
+            self.value = [value]
             self.color = color
             self.left = None
             self.right = None
@@ -90,13 +90,15 @@ class Map:
         node.left.color = BLACK
         node.right.color = BLACK
 
-    def _put(self, node: TNode, key, value) -> TNode:
+    def _put(self, node: TNode, key, value, replace) -> TNode:
         if node is None:
             return Map.TNode(key, value, RED)
         
         if key < node.key: node.left = self._put(node.left, key, value)
         elif key > node.key: node.right = self._put(node.right, key, value)
-        else: node.value = value
+        else: 
+            if replace: node.value = [value]
+            else: node.value.append(value)
 
         if self._is_red(node.right) and not self._is_red(node.left): node = self._rotate_left(node)
         if self._is_red(node.left) and self._is_red(node.left.left): node = self._rotate_right(node)
