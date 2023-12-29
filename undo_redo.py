@@ -24,17 +24,19 @@ def prettifyHandle(self):
         self.outputTextArea.insertPlainText(self.tree.convert(False, True))
         self.save_current_state()
                 
-        def save_current_state(self):
+def save_current_state(self):
         current_content = self.outputTextArea.toPlainText()
         if not self.stack or current_content != self.stack[-1]:
             self.stack.append(current_content)
 
-    def undo(self):
+def undo(self):
         if self.stack:
             current_state = self.stack.pop()
             self.redo_stack.append(current_state)
             self.outputTextArea.clear()
-            self.outputTextArea.insertPlainText(self.stack[-1])
+            # Check if there is a state left in the stack
+            if self.stack:
+                self.outputTextArea.insertPlainText(self.stack[-1])
         else:
             self.outputTextArea.clear()
 
