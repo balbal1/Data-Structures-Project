@@ -86,6 +86,8 @@ class User:
                 print(post.body, end=" - ")
                 print(post.topics)
 
+            print(Post.map.get('sports'))
+
             print("------")
 
     @classmethod
@@ -101,4 +103,4 @@ class User:
 
         User.print_all_users()
 
-# User.test()
+User.test()

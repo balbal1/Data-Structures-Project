@@ -23,6 +23,16 @@ class Map:
     def delete(self, key):
         del self.dict[key]
 
+   
+
+    def appendlistvalue(self, key, value):
+        if self.get(key):
+            self.dict[key].append(value)
+        else:
+            self.dict[key] = [value]
+
+
+
     def contains(self, key):
         return key in self.dict
 
@@ -32,22 +42,17 @@ class Map:
     @classmethod
     def test(cls):
         map = Map()
-        map.put(1, "a")
-        map.put(2, "b")
-        map.put(3, "c")
-        map.put(4, "d")
-        map.put(5, "e")
-        map.put(6, "f")
+        # map.put(1, "a")
+        # map.put(2, "b")
+        # map.put(3, "c")
+        # map.appendlistvalue(6, "f")
+        # map.appendlistvalue(6, "d")
 
-        print(map.get(1))
-        print(map.get(2))
-        print(map.get(3))
-
-        map.delete(1)
-        print(map.get(1))
-        print(map.get(2))
+        map.put(4, ["d"])
+        map.put(4,map.get(4).append('o'))
+        print(map.get(4))
         
-
+Map.test()
     # Private Methods
     # TODO: Implement the class with red-black tree
 
