@@ -16,6 +16,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(" XML Editor")
         self.setWindowIcon(QIcon("icons/logo.png"))
         self.tree = None
+        self.stack = []
+        self.redo_stack = []
 
         self.inputTextArea = QPlainTextEdit()
         self.outputTextArea = QPlainTextEdit()
@@ -27,16 +29,22 @@ class MainWindow(QMainWindow):
         self.helpButton = Button("icons/HelpSymbol", "Help")
         self.closeButton = Button("icons/CloseSymbol", "Quit")
         
+        self.undoButton = Button("icons/UndoSymbol", "Undo")
+        self.redoButton = Button("icons/RedoSymbol", "Redo")
         self.showButton = Button("icons/ShowSymbol", "Detect Errors")
         self.fixButton = Button("icons/FixSymbol", "Fix Errors")
         self.prettifyButton = Button("icons/FormatSymbol", "Prettify")
         self.minifyButton = Button("icons/MinifySymbol", "Minify")
-        self.convertButton = Button("icons/ConvertSymbol", "Convert")
+        self.convertButton = Button("icons/ConvertSymbol", "Convert to JSON")
         
+        self.undoButton.disabled = True
+        self.redoButton.disabled = True
         self.prettifyButton.disabled = True
         self.minifyButton.disabled = True
         self.convertButton.disabled = True
         self.fixButton.disabled = True
+        self.undoButton.setObjectName("disabled")
+        self.redoButton.setObjectName("disabled")
         self.prettifyButton.setObjectName("disabled")
         self.minifyButton.setObjectName("disabled")
         self.convertButton.setObjectName("disabled")
@@ -54,11 +62,13 @@ class MainWindow(QMainWindow):
         self.prettifyButton.clicked.connect(self.prettifyHandle)
         self.minifyButton.clicked.connect(self.minifyHandle)
         self.convertButton.clicked.connect(self.convertHandle) 
+        self.undoButton.clicked.connect(self.undoHandle)
+        self.redoButton.clicked.connect(self.redoHandle)
 
         self.tabs = QTabWidget()
         self.tabs.setTabPosition(QTabWidget.North)
         self.tabs.addTab(self.buttonBarLayout([self.openButton, self.saveButton, self.helpButton, self.closeButton]), "file")
-        self.tabs.addTab(self.buttonBarLayout([self.showButton, self.fixButton, self.prettifyButton, self.minifyButton, self.convertButton]), "edit")
+        self.tabs.addTab(self.buttonBarLayout([self.undoButton, self.redoButton, self.showButton, self.fixButton, self.prettifyButton, self.minifyButton, self.convertButton]), "edit")
         
         body = QHBoxLayout()
         body.addWidget(self.inputTextArea)
@@ -102,14 +112,17 @@ class MainWindow(QMainWindow):
     def prettifyHandle(self):
         self.outputTextArea.clear()
         self.outputTextArea.insertPlainText(self.tree.prettify())
+        self.save_current_state()
 
     def minifyHandle(self):
         self.outputTextArea.clear()
         self.outputTextArea.insertPlainText(self.tree.minify())
+        self.save_current_state()
 
     def convertHandle(self):
         self.outputTextArea.clear()
         self.outputTextArea.insertPlainText(self.tree.convert(False, True))
+        self.save_current_state()
 
     def showHandle(self):
         text = list(self.inputTextArea.toPlainText().split("\n"))
@@ -164,6 +177,41 @@ class MainWindow(QMainWindow):
             self.inputTextArea.clear()
             self.inputTextArea.insertPlainText(text)
     
+    def save_current_state(self):
+        current_content = self.outputTextArea.toPlainText()
+        self.stack.append(current_content)
+        self.redo_stack = []
+        self.undoButton.disabled = False
+        self.undoButton.setObjectName("enabled")
+        self.redoButton.disabled = True
+        self.redoButton.setObjectName("disabled")
+        self.updateTabs()
+
+    def undoHandle(self):
+        current_state = self.stack.pop()
+        self.redo_stack.append(current_state)
+        self.outputTextArea.clear()
+        self.outputTextArea.insertPlainText(self.stack[-1] if self.stack else "")
+        self.redoButton.disabled = False
+        self.redoButton.setObjectName("enabled")
+        if not self.stack:
+            self.undoButton.disabled = True
+            self.undoButton.setObjectName("disabled")
+        self.updateTabs()
+
+    def redoHandle(self):
+        next_state = self.redo_stack.pop()
+        self.stack.append(next_state)
+        self.outputTextArea.clear()
+        self.outputTextArea.insertPlainText(next_state)
+        self.undoButton.disabled = False
+        self.undoButton.setObjectName("enabled")
+        if not self.redo_stack:
+            self.redoButton.disabled = True
+            self.redoButton.setObjectName("disabled")
+        self.updateTabs()
+
+
     def openButtons(self):
         self.showButton.disabled = True
         self.fixButton.disabled = True
@@ -193,7 +241,7 @@ class MainWindow(QMainWindow):
     def updateTabs(self):
         i = self.tabs.currentIndex()
         self.tabs.removeTab(1)
-        self.tabs.addTab(self.buttonBarLayout([self.showButton, self.fixButton, self.prettifyButton, self.minifyButton, self.convertButton]), "edit")
+        self.tabs.addTab(self.buttonBarLayout([self.undoButton, self.redoButton, self.showButton, self.fixButton, self.prettifyButton, self.minifyButton, self.convertButton]), "edit")
         if i == 1:
             self.tabs.setCurrentIndex(1)
 
