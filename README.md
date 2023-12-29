@@ -19,4 +19,6 @@ Effortlessly search for posts containing specific words or topics within the soc
 The inclusion of undo and redo functionality enhances user experience by allowing seamless reverting or reapplication of changes made during the editing process. This feature adds a layer of flexibility to user interactions.
 ## Technical Implementation
 To meet project constraints, the implementation adheres to a set of predefined data structures, including arrays, dynamic arrays (vectors), linked lists, stacks, queues, and priority queues (heap). Notably, the team had the challenge of implementing the map function from scratch.
+
+## Installation Instructions
 ## References
