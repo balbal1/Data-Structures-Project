@@ -14,21 +14,18 @@ def prettifyHandle(self):
         self.save_current_state()
                 
         def save_current_state(self):
-            current_content = self.outputTextArea.toPlainText()
+        current_content = self.outputTextArea.toPlainText()
+        if not self.stack or current_content != self.stack[-1]:
             self.stack.append(current_content)
-
-  
 
     def undo(self):
         if self.stack:
             current_state = self.stack.pop()
             self.redo_stack.append(current_state)
             self.outputTextArea.clear()
-            self.outputTextArea.insertPlainText(self.stack[-1] if self.stack else "")
+            self.outputTextArea.insertPlainText(self.stack[-1])
         else:
             self.outputTextArea.clear()
-            self.outputTextArea.insertPlainText("")
-            # self.redo_stack.append("")
 
     def redo(self):
         if self.redo_stack:
@@ -38,5 +35,3 @@ def prettifyHandle(self):
             self.outputTextArea.insertPlainText(next_state)
         else:
             self.outputTextArea.clear()
-            self.outputTextArea.insertPlainText("")
-            # self.stack.append("")
