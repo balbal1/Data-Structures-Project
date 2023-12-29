@@ -1,3 +1,14 @@
+self.stack = []
+self.redo_stack = []
+
+self.undoButton = Button("icons/UndoSymbol", "Undo")
+self.redoButton = Button("icons/RedoSymbol", "Redo")
+
+self.undoButton.clicked.connect(self.undo)
+self.redoButton.clicked.connect(self.redo)
+
+self.tabs.addTab(self.buttonBarLayout([self.showButton, self.fixButton, self.prettifyButton, self.minifyButton, self.convertButton,self.undoButton,self.redoButton]), "edit")
+
 def prettifyHandle(self):
         self.outputTextArea.clear()
         self.outputTextArea.insertPlainText(self.tree.prettify())
