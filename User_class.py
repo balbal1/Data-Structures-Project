@@ -9,7 +9,7 @@ class User:
 
     @classmethod
     def get_user(cls, id):
-        return cls._users_map.get(id)
+        return cls._users_map.get(id)[0]
     
     @classmethod
     def get_all_users(cls):
