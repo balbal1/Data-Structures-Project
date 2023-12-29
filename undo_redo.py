@@ -29,21 +29,18 @@ def save_current_state(self):
         if not self.stack or current_content != self.stack[-1]:
             self.stack.append(current_content)
 
-def undo(self):
+    def undo(self):
         if self.stack:
             current_state = self.stack.pop()
             self.redo_stack.append(current_state)
             self.outputTextArea.clear()
-            # Check if there is a state left in the stack
-            if self.stack:
-                self.outputTextArea.insertPlainText(self.stack[-1])
+            self.outputTextArea.insertPlainText(self.stack[-1])
         else:
             self.outputTextArea.clear()
 
     def redo(self):
         if self.redo_stack:
             next_state = self.redo_stack.pop()
-            self.stack.append(next_state)
             self.outputTextArea.clear()
             self.outputTextArea.insertPlainText(next_state)
         else:
