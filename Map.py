@@ -20,6 +20,16 @@ class Map:
             
         return None
 
+   
+
+    def appendlistvalue(self, key, value):
+        if self.get(key):
+            self.dict[key].append(value)
+        else:
+            self.dict[key] = [value]
+
+
+
     def contains(self, key):
         return self.get(key) != None
 
@@ -29,6 +39,7 @@ class Map:
     @classmethod
     def test(cls):
         map = Map()
+
         map.put(1, "a")
         map.put(2, "b")
         map.put(3, "c")
@@ -46,7 +57,7 @@ class Map:
         print(map.contains(10))
         print(map.contains(2))
         
-
+Map.test()
     # Private Methods
                 
     class TNode:
