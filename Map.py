@@ -1,33 +1,30 @@
-class Node:
-    def __init__(self, key, value, color):
-        self.key = key
-        self.value = value
-        self.color = color
-        self.left = None
-        self.right = None
-        self.parent = None
 
+RED = "red"
+BLACK = "black"
 
 class Map:
     # Public Interface
 
-    def __init__(self):
-        self.dict = {}
-
     def put(self, key, value):
-        self.dict[key] = value
+        self.root = self._put(self.root, key, value)
 
-    def get(self, key):
-        return self.dict[key] if key in self.dict else None
-
-    def delete(self, key):
-        del self.dict[key]
+    def get(self, key):        
+        node = self.root
+        while(node != None):
+            if(key < node.key):
+                node = node.left
+            elif(key > node.key):
+                node = node.right
+            else:
+                return node.value
+            
+        return None
 
     def contains(self, key):
-        return key in self.dict
+        return self.get(key) != None
 
     def is_empty(self):
-        return len(self.dict) == 0
+        return self.root == None
     
     @classmethod
     def test(cls):
@@ -38,16 +35,74 @@ class Map:
         map.put(4, "d")
         map.put(5, "e")
         map.put(6, "f")
+        map.put(20, "x")
 
         print(map.get(1))
         print(map.get(2))
         print(map.get(3))
+        print(map.get(20))
 
-        map.delete(1)
-        print(map.get(1))
-        print(map.get(2))
+
+        print(map.contains(10))
+        print(map.contains(2))
         
 
     # Private Methods
-    # TODO: Implement the class with red-black tree
+                
+    class TNode:
+        def __init__(self, key, value, color):
+            self.key = key
+            self.value = value
+            self.color = color
+            self.left = None
+            self.right = None
 
+    
+    def __init__(self):
+        self.root: Map.TNode = None
+
+    def _is_red(self, node: TNode):
+        if node is None:
+            return False
+
+        return node.color == RED
+    
+    def _rotate_left(self, node: TNode) -> TNode:
+        h = node
+        x = h.right
+        h.right = x.left
+        x.left = h
+        x.color = h.color
+        h.color = RED
+        return x
+    
+    def _rotate_right(self, node: TNode) -> TNode:
+        h = node
+        x = h.left
+        h.left = x.right
+        x.right = h
+        x.color = h.color
+        h.color = RED
+        return x
+    
+    def _flip_colors(self, node: TNode):
+        node.color = RED
+        node.left.color = BLACK
+        node.right.color = BLACK
+
+    def _put(self, node: TNode, key, value) -> TNode:
+        if node is None:
+            return Map.TNode(key, value, RED)
+        
+        if key < node.key: node.left = self._put(node.left, key, value)
+        elif key > node.key: node.right = self._put(node.right, key, value)
+        else: node.value = value
+
+        if self._is_red(node.right) and not self._is_red(node.left): node = self._rotate_left(node)
+        if self._is_red(node.left) and self._is_red(node.left.left): node = self._rotate_right(node)
+        if self._is_red(node.left) and self._is_red(node.right): self._flip_colors(node)
+
+        return node
+
+
+# Map.test()
