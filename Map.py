@@ -20,14 +20,8 @@ class Map:
             
         return None
 
-   
-
     def appendlistvalue(self, key, value):
-        if self.get(key):
-            self.dict[key].append(value)
-        else:
-            self.dict[key] = [value]
-
+        self.put(key, value, False)
 
 
     def contains(self, key):
@@ -57,7 +51,6 @@ class Map:
         print(map.contains(10))
         print(map.contains(2))
         
-Map.test()
     # Private Methods
                 
     class TNode:
@@ -105,8 +98,8 @@ Map.test()
         if node is None:
             return Map.TNode(key, value, RED)
         
-        if key < node.key: node.left = self._put(node.left, key, value)
-        elif key > node.key: node.right = self._put(node.right, key, value)
+        if key < node.key: node.left = self._put(node.left, key, value, replace)
+        elif key > node.key: node.right = self._put(node.right, key, value, replace)
         else: 
             if replace: node.value = [value]
             else: node.value.append(value)
@@ -118,4 +111,4 @@ Map.test()
         return node
 
 
-# Map.test()
+Map.test()
