@@ -23,18 +23,12 @@ class Post:
                     topics.append(topic.text)
 
         for word in cls.all_posts[-1].split():
-            cls.map.appendlistvalue(word,cls.all_posts[-1])
+            cls.map.appendlistvalue(word.lower(),cls.all_posts[-1])
         for topic in topics:
-            cls.map.appendlistvalue(topic,cls.all_posts[-1])
+            cls.map.appendlistvalue(topic.lower(),cls.all_posts[-1])
 
         return Post(body, topics)
 
-
-
-
-    
-    
-        
-
-    
-
+    @classmethod
+    def search(cls, word):
+        return cls.map.get(word.lower())
