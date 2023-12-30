@@ -86,7 +86,7 @@ class User:
                 print(post.body, end=" - ")
                 print(post.topics)
 
-            print(Post.map.get('sports'))
+            print(Post.search('Education'))
 
             print("------")
 
@@ -102,5 +102,6 @@ class User:
         User.parse_users_node(node)
 
         User.print_all_users()
+
 
 User.test()
