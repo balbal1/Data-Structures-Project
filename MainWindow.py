@@ -6,6 +6,7 @@ from parse_xml import xml2tree
 from compression import compress, decompress
 from errors_detection import error_detection
 from errors_correction import error_correction
+from User_class import User
 from GraphWindow import GraphWindow
 
 class MainWindow(QMainWindow):
@@ -167,6 +168,7 @@ class MainWindow(QMainWindow):
             self.tree = xml2tree(self.inputTextArea.toPlainText())
     
     def visualizeHandle(self):
+        User.parse_users_node(self.tree)
         self.graphWindow = GraphWindow()
         self.graphWindow.show()
         with open("graphStyle.qss", "r") as f:
@@ -190,13 +192,14 @@ class MainWindow(QMainWindow):
     
     def save_current_state(self):
         current_content = self.outputTextArea.toPlainText()
-        self.stack.append(current_content)
-        self.redo_stack = []
-        self.undoButton.disabled = False
-        self.undoButton.setObjectName("enabled")
-        self.redoButton.disabled = True
-        self.redoButton.setObjectName("disabled")
-        self.updateTabs()
+        if not self.stack or current_content != self.stack[-1]:
+            self.stack.append(current_content)
+            self.redo_stack = []
+            self.undoButton.disabled = False
+            self.undoButton.setObjectName("enabled")
+            self.redoButton.disabled = True
+            self.redoButton.setObjectName("disabled")
+            self.updateTabs()
 
     def undoHandle(self):
         current_state = self.stack.pop()

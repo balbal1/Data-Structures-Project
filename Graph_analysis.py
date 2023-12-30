@@ -1,4 +1,6 @@
-
+import networkx as nx 
+import matplotlib.pyplot as plt 
+import numpy
 from  User_class import User
 
 class Graph_Analysis:
@@ -8,6 +10,7 @@ class Graph_Analysis:
         self.vertices_no=len(User.get_all_users())
         self.vertices=[]
         self.edges=[]
+        self.visualEdges=[]
         self.create_vertices_edges()
         self.most_influencer=self.Most_influencer()
         self.most_active=self.Most_active()
@@ -19,6 +22,7 @@ class Graph_Analysis:
             self.vertices.append(user.name)
             for follow in user.following:
                 self.edges.append([user.name,follow.name])
+                self.visualEdges.append([user.name.replace(' ', '\n') + "\n" + f'({user.id})',follow.name.replace(' ', '\n') + "\n" + f'({follow.id})'])
         
 
     def Most_influencer(self):
@@ -27,7 +31,7 @@ class Graph_Analysis:
             if most< len(v.followers):
                 most=len(v.followers)
                 influencer=v          
-        return influencer.name
+        return influencer.name.replace(' ', '\n') + "\n" + f'({influencer.id})'
     
 
     def Most_active(self):
@@ -36,9 +40,11 @@ class Graph_Analysis:
             if most< len(v.following):
                 most=len(v.following)
                 influencer=v          
-        return influencer.name
+        return influencer.name.replace(' ', '\n') + "\n" + f'({influencer.id})'
     
-    def mutual_followers(self,user1,user2):
+    def mutual_followers(self,user1id,user2id):
+        user1 = User.get_user(user1id)
+        user2 = User.get_user(user2id)
         if user1 not in self.users:
             print("Vertex ", user1, " does not exist.")
         elif user2 not in self.users:
@@ -48,16 +54,17 @@ class Graph_Analysis:
         mutual=[]
         for f in followers1:
             if f in followers2:
-                mutual.append(f.name)
+                mutual.append(f.name.replace(' ', '\n') + "\n" + f'({f.id})')
         return mutual
 
 
-    def suggest_tofollow(self,user):
+    def suggest_tofollow(self,userid):
+        user = User.get_user(userid)
         suggest=[]
         for f in user.followers:
             for ff in f.followers:
                 if ff not in user.followers and ff is not user and ff not in suggest:
-                    suggest.append(ff.name)
+                    suggest.append(ff.name.replace(' ', '\n') + "\n" + f'({ff.id})')
         return suggest
     
 
@@ -77,16 +84,13 @@ class Graph_Analysis:
 
 
     def matrix(self):
-        
         return self.graph
-    
 
-
-
-
-User.test()
-mygraph=Graph_Analysis()
-print(mygraph.most_influencer)
-print(mygraph.most_active)
-print(mygraph.mutual_followers(User.get_all_users()[2],User.get_all_users()[1]))
-print(mygraph.suggest_foreach_user())
+    def visualize(self, v): 
+        G = nx.DiGraph()
+        G.add_edges_from(self.visualEdges) 
+        numpy.random.seed(50)
+        plt.figure(1,figsize=(8,8))
+        nx.draw_networkx(G, font_size=12, font_color='black', node_size=3000, width=3, arrowsize=20, node_color=['#ff7f50' if (node_name in v)  else '#add8e6' for node_name in list(G.nodes)])
+        plt.savefig("graph.png")
+        plt.clf()    

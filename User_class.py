@@ -102,5 +102,3 @@ class User:
         User.parse_users_node(node)
 
         User.print_all_users()
-
-User.test()

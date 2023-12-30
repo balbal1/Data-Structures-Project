@@ -1,6 +1,7 @@
 from PySide2.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QComboBox, QLineEdit, QScrollArea, QVBoxLayout, QHBoxLayout
 from PySide2.QtGui import QIcon, QPixmap
 from Post import Post
+from Post_class import Post as PostClass
 from Graph_analysis import Graph_Analysis
 
 class GraphWindow(QMainWindow):
@@ -13,7 +14,6 @@ class GraphWindow(QMainWindow):
         self.setWindowIcon(QIcon("icons/logo.png"))
         self.graph = Graph_Analysis()
 
-        self.graph.makeGraph()
         self.graph.visualize([])
         graphmap = QPixmap("graph.png")
         self.graphImage = QLabel()
@@ -23,20 +23,24 @@ class GraphWindow(QMainWindow):
         activeButton = QPushButton("Find most active user")
         mutualButton = QPushButton("Find mutual users")
         suggestButton = QPushButton("Suggest users")
-        mutualComboButton1 = QComboBox()
-        mutualComboButton2 = QComboBox()
-        suggestComboButton = QComboBox()
-        mutualComboButton1.addItems(["Ahmed Ali (1)", "Yasser Ahmed (2)", "Mohamed Sherif (3)"])
-        mutualComboButton2.addItems(["Ahmed Ali (1)", "Yasser Ahmed (2)", "Mohamed Sherif (3)"])
-        suggestComboButton.addItems(["Ahmed Ali (1)", "Yasser Ahmed (2)", "Mohamed Sherif (3)"])
+        self.mutualComboButton1 = QComboBox()
+        self.mutualComboButton2 = QComboBox()
+        self.suggestComboButton = QComboBox()
+        names = []
+        for user in self.graph.users:
+            names.append(f'{user.name} ({user.id})')
+        self.mutualComboButton1.addItems(names)
+        self.mutualComboButton2.addItems(names[1:])
+        self.suggestComboButton.addItems(names)
+        self.mutualComboButton1.currentTextChanged.connect(self.updateComboBox)
 
         influencerButton.setFixedSize(280,40)
         activeButton.setFixedSize(250,40)
         mutualButton.setFixedSize(220,40)
         suggestButton.setFixedSize(220,40)
-        mutualComboButton1.setFixedHeight(30)
-        mutualComboButton2.setFixedHeight(30)
-        suggestComboButton.setFixedHeight(30)
+        self.mutualComboButton1.setFixedHeight(30)
+        self.mutualComboButton2.setFixedHeight(30)
+        self.suggestComboButton.setFixedHeight(30)
 
         topButtonsTitle = QLabel("Network Analysis:")
         topButtonsTitle.setObjectName("mainTitle")
@@ -50,8 +54,8 @@ class GraphWindow(QMainWindow):
         mutualButtonsTitle.setObjectName("title")
         mutualButtons = QHBoxLayout()
         mutualButtons.addStretch()
-        mutualButtons.addWidget(mutualComboButton1, 0)
-        mutualButtons.addWidget(mutualComboButton2, 1)
+        mutualButtons.addWidget(self.mutualComboButton1, 0)
+        mutualButtons.addWidget(self.mutualComboButton2, 1)
         mutualButtons.addStretch()
         mutualButtons.addWidget(mutualButton, 2)
         mutualButtons.setContentsMargins(10,0,10,10)
@@ -61,7 +65,7 @@ class GraphWindow(QMainWindow):
         suggestButtonsTitle.setObjectName("title")
         suggestButtons = QHBoxLayout()
         suggestButtons.addStretch()
-        suggestButtons.addWidget(suggestComboButton, 0)
+        suggestButtons.addWidget(self.suggestComboButton, 0)
         suggestButtons.addStretch()
         suggestButtons.addWidget(suggestButton, 1)
         suggestButtons.setContentsMargins(10,0,10,20)
@@ -69,12 +73,12 @@ class GraphWindow(QMainWindow):
         searchTitle = QLabel("Search posts")
         searchTitle.setFixedHeight(30)
         searchTitle.setObjectName("mainTitle")
-        searchBar = QLineEdit()
+        self.searchBar = QLineEdit()
         searchButton = QPushButton("Search")
         searchButton.setFixedSize(150,40)
 
         searchTools = QHBoxLayout()
-        searchTools.addWidget(searchBar, 0)
+        searchTools.addWidget(self.searchBar, 0)
         searchTools.addWidget(searchButton, 1)
         
         self.searchResults = QScrollArea()
@@ -127,34 +131,43 @@ class GraphWindow(QMainWindow):
         self.setCentralWidget(widget)
     
     def influencerHandle(self):
-        self.graph.visualize(['5'])
+        self.graph.visualize([self.graph.most_influencer])
         graphmap = QPixmap("graph.png")
         self.graphImage.setPixmap(graphmap)
 
     def activeHandle(self):
-        self.graph.visualize(['3'])
+        self.graph.visualize([self.graph.most_active])
         graphmap = QPixmap("graph.png")
         self.graphImage.setPixmap(graphmap)
 
     def mutualHandle(self):
-        self.graph.visualize(['2', '4'])
+        id1 = self.mutualComboButton1.currentText()[-2]
+        id2 = self.mutualComboButton2.currentText()[-2]
+        self.graph.visualize(self.graph.mutual_followers(id1, id2))
         graphmap = QPixmap("graph.png")
         self.graphImage.setPixmap(graphmap)
 
     def suggestHandle(self):
-        self.graph.visualize(['1', '3', '4'])
+        id = self.suggestComboButton.currentText()[-2]
+        self.graph.visualize(self.graph.suggest_tofollow(id))
         graphmap = QPixmap("graph.png")
         self.graphImage.setPixmap(graphmap)
 
     def searchHandle(self):
-        posts = [["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", "Ahmed Ali", ["economy", "finance"]],
-                 ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", "Ahmed Ali", ["solar_energy"]],
-                 ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", "Yasser Ahmed", ["education"]],
-                 ["Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.", "Mohamed Sherif", ["sports"]]]
+        posts = PostClass.map.get(self.searchBar.text())
         layout = QVBoxLayout()
-        for post in posts:
-            post = Post(post[0], post[1], post[2])
-            layout.addWidget(post)
+        if posts:
+            for post in posts:
+                post = Post(post, "", "")
+                layout.addWidget(post)
         widget = QWidget()
         widget.setLayout(layout)
         self.searchResults.setWidget(widget)
+
+    def updateComboBox(self):
+        self.mutualComboButton2.clear()
+        names = []
+        for user in self.graph.users:
+            if user.id != self.mutualComboButton1.currentText()[-2]:
+                names.append(f'{user.name} ({user.id})')
+        self.mutualComboButton2.addItems(names)
