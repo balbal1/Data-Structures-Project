@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
         else:
             self.graphWindow = GraphWindow()
             self.graphWindow.show()
-            with open("styles/graphStyle.qss", "r") as f:
+            with open("src/styles/graphStyle.qss", "r") as f:
                 _style = f.read()
                 self.graphWindow.setStyleSheet(_style)
 
