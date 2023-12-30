@@ -154,7 +154,7 @@ class GraphWindow(QMainWindow):
         self.graphImage.setPixmap(graphmap)
 
     def searchHandle(self):
-        posts = PostClass.map.get(self.searchBar.text())
+        posts = PostClass.map.get(self.searchBar.text().lower())
         layout = QVBoxLayout()
         if posts:
             for post in posts:
