@@ -1,13 +1,14 @@
 from PySide2.QtWidgets import QMainWindow, QWidget, QPushButton, QMessageBox, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QTabWidget, QFileDialog
 from PySide2.QtGui import QIcon, QTextCharFormat, QFont, Qt
 import sys
-from Button import Button, DoubleButton
-from parse_xml import xml2tree
-from compression import compress, decompress
-from errors_detection import error_detection
-from errors_correction import error_correction
-from User_class import User
-from GraphWindow import GraphWindow
+sys.path.append("..")
+from GUI.Button import Button, DoubleButton
+from xml_tree.parse_xml import xml2tree
+from xml_tree.compression import compress, decompress
+from xml_tree.errors_detection import error_detection
+from xml_tree.errors_correction import error_correction
+from network_graph.User_class import User
+from GUI.GraphWindow import GraphWindow
 
 class MainWindow(QMainWindow):
     
@@ -16,7 +17,7 @@ class MainWindow(QMainWindow):
 
         self.setGeometry(400, 200, 1200, 800)
         self.setWindowTitle(" XML Editor")
-        self.setWindowIcon(QIcon("icons/logo.png"))
+        self.setWindowIcon(QIcon("../icons/logo.png"))
         self.tree = None
         self.stack = []
         self.redo_stack = []
@@ -179,7 +180,7 @@ class MainWindow(QMainWindow):
         else:
             self.graphWindow = GraphWindow()
             self.graphWindow.show()
-            with open("graphStyle.qss", "r") as f:
+            with open("styles/graphStyle.qss", "r") as f:
                 _style = f.read()
                 self.graphWindow.setStyleSheet(_style)
 

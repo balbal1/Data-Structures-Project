@@ -1,8 +1,10 @@
 from PySide2.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QComboBox, QLineEdit, QScrollArea, QVBoxLayout, QHBoxLayout, QMessageBox
 from PySide2.QtGui import QIcon, QPixmap
-from Post import Post
-from Post_class import Post as PostClass
-from Graph_analysis import Graph_Analysis
+import sys
+sys.path.append("..")
+from GUI.Post import Post
+from network_graph.Post_class import Post as PostClass
+from network_graph.GraphAnalysis import Graph_Analysis
 
 class GraphWindow(QMainWindow):
     
@@ -11,11 +13,11 @@ class GraphWindow(QMainWindow):
         
         self.setGeometry(200, 200, 1200, 800)
         self.setWindowTitle(" Graph Viewer")
-        self.setWindowIcon(QIcon("icons/logo.png"))
+        self.setWindowIcon(QIcon("../icons/logo.png"))
         self.graph = Graph_Analysis()
 
         self.graph.visualize([])
-        graphmap = QPixmap("graph.png")
+        graphmap = QPixmap("icons/graph.png")
         self.graphImage = QLabel()
         self.graphImage.setPixmap(graphmap)
 
@@ -132,12 +134,12 @@ class GraphWindow(QMainWindow):
     
     def influencerHandle(self):
         self.graph.visualize([self.graph.most_influencer])
-        graphmap = QPixmap("graph.png")
+        graphmap = QPixmap("icons/graph.png")
         self.graphImage.setPixmap(graphmap)
 
     def activeHandle(self):
         self.graph.visualize([self.graph.most_active])
-        graphmap = QPixmap("graph.png")
+        graphmap = QPixmap("icons/graph.png")
         self.graphImage.setPixmap(graphmap)
 
     def mutualHandle(self):
@@ -146,7 +148,7 @@ class GraphWindow(QMainWindow):
         mutual = self.graph.mutual_followers(id1, id2)
         if mutual:
             self.graph.visualize(mutual)
-            graphmap = QPixmap("graph.png")
+            graphmap = QPixmap("icons/graph.png")
             self.graphImage.setPixmap(graphmap)
         else:
             QMessageBox.about(QPushButton(), "Alert", "No mutual users.")
@@ -156,7 +158,7 @@ class GraphWindow(QMainWindow):
         suggest = self.graph.suggest_tofollow(id)
         if suggest:
             self.graph.visualize(suggest)
-            graphmap = QPixmap("graph.png")
+            graphmap = QPixmap("icons/graph.png")
             self.graphImage.setPixmap(graphmap)
         else:
             QMessageBox.about(QPushButton(), "Alert", "No suggested users.")

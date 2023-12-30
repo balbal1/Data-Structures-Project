@@ -1,4 +1,6 @@
-from BST import BinaryTree
+import sys
+sys.path.append("..")
+from xml_tree.BinaryTree import BinaryTree
 
 def compress(xmlString):
 

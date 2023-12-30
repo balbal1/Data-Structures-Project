@@ -1,7 +1,9 @@
-from Node import Node
-from Post_class import Post
-from Map import Map
-from parse_xml import xml2tree
+import sys
+sys.path.append("..")
+from xml_tree.Node import Node
+from network_graph.Post_class import Post
+from network_graph.Map import Map
+from xml_tree.parse_xml import xml2tree
 
 class User:
     _all_users = []

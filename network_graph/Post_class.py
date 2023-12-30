@@ -1,5 +1,7 @@
-from Node import Node
-from Map import Map
+import sys
+sys.path.append("..")
+from xml_tree.Node import Node
+from network_graph.Map import Map
 
 class Post:
     all_posts = []

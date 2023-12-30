@@ -1,12 +1,12 @@
 from PySide2.QtWidgets import QApplication
 import sys
-from MainWindow import MainWindow
+from GUI.MainWindow import MainWindow
 
 app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
 
-with open("style.qss", "r") as f:
+with open("styles/mainStyle.qss", "r") as f:
     _style = f.read()
     window.setStyleSheet(_style)
 
