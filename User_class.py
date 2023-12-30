@@ -103,5 +103,3 @@ class User:
 
         User.print_all_users()
 
-
-User.test()

@@ -109,6 +109,3 @@ class Map:
         if self._is_red(node.left) and self._is_red(node.right): self._flip_colors(node)
 
         return node
-
-
-Map.test()
