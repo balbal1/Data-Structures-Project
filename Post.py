@@ -1,5 +1,4 @@
-from PySide2.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QComboBox, QLineEdit, QMessageBox, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QTabWidget, QFileDialog
-from PySide2.QtGui import QIcon, QTextCharFormat, QFont, Qt, QPixmap
+from PySide2.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 
 class Post(QWidget):
     

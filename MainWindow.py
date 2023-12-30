@@ -137,6 +137,7 @@ class MainWindow(QMainWindow):
         elif errors == []:
             self.openButtons()
             self.tree = xml2tree(self.inputTextArea.toPlainText())
+            QMessageBox.about(QPushButton(), "Success", "No errors in XML")
         else:
             self.inputTextArea.clear()
             myClassFormat = QTextCharFormat()
@@ -156,24 +157,31 @@ class MainWindow(QMainWindow):
         text = list(self.inputTextArea.toPlainText().split("\n"))
         text = error_correction(error_detection(text), text)
         errors = error_detection(text)
-        self.inputTextArea.clear()
-        myClassFormat = QTextCharFormat()
-        myClassFormat.setForeground(Qt.black)
-        self.inputTextArea.setCurrentCharFormat(myClassFormat)
-        for line in text:
-            self.inputTextArea.insertPlainText(line + "\n")
-        self.inputTextArea.textCursor().deletePreviousChar()
         if errors == []:
+            self.inputTextArea.clear()
+            myClassFormat = QTextCharFormat()
+            myClassFormat.setForeground(Qt.black)
+            self.inputTextArea.setCurrentCharFormat(myClassFormat)
+            for line in text:
+                self.inputTextArea.insertPlainText(line + "\n")
+            self.inputTextArea.textCursor().deletePreviousChar()
             self.openButtons()
             self.tree = xml2tree(self.inputTextArea.toPlainText())
-    
+            QMessageBox.about(QPushButton(), "Success", "Errors fixed successfully!")
+        else:
+            QMessageBox.about(QPushButton(), "Error", "Invalix XML format. Can't fix errors.")
+
     def visualizeHandle(self):
-        User.parse_users_node(self.tree)
-        self.graphWindow = GraphWindow()
-        self.graphWindow.show()
-        with open("graphStyle.qss", "r") as f:
-            _style = f.read()
-            self.graphWindow.setStyleSheet(_style)
+        try:
+            User.parse_users_node(self.tree)
+        except Exception as e:
+            QMessageBox.about(QPushButton(), "Error", "Invalid social network XML provided")
+        else:
+            self.graphWindow = GraphWindow()
+            self.graphWindow.show()
+            with open("graphStyle.qss", "r") as f:
+                _style = f.read()
+                self.graphWindow.setStyleSheet(_style)
 
     def compressHandle(self):
         path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'comp files (*.comp)')

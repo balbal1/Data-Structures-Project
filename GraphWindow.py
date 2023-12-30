@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QComboBox, QLineEdit, QScrollArea, QVBoxLayout, QHBoxLayout
+from PySide2.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QComboBox, QLineEdit, QScrollArea, QVBoxLayout, QHBoxLayout, QMessageBox
 from PySide2.QtGui import QIcon, QPixmap
 from Post import Post
 from Post_class import Post as PostClass
@@ -9,7 +9,7 @@ class GraphWindow(QMainWindow):
     def __init__(self):
         super(GraphWindow, self).__init__()
         
-        self.setGeometry(400, 200, 1200, 800)
+        self.setGeometry(200, 200, 1200, 800)
         self.setWindowTitle(" Graph Viewer")
         self.setWindowIcon(QIcon("icons/logo.png"))
         self.graph = Graph_Analysis()
@@ -143,22 +143,30 @@ class GraphWindow(QMainWindow):
     def mutualHandle(self):
         id1 = self.mutualComboButton1.currentText()[-2]
         id2 = self.mutualComboButton2.currentText()[-2]
-        self.graph.visualize(self.graph.mutual_followers(id1, id2))
-        graphmap = QPixmap("graph.png")
-        self.graphImage.setPixmap(graphmap)
+        mutual = self.graph.mutual_followers(id1, id2)
+        if mutual:
+            self.graph.visualize(mutual)
+            graphmap = QPixmap("graph.png")
+            self.graphImage.setPixmap(graphmap)
+        else:
+            QMessageBox.about(QPushButton(), "Alert", "No mutual users.")
 
     def suggestHandle(self):
         id = self.suggestComboButton.currentText()[-2]
-        self.graph.visualize(self.graph.suggest_tofollow(id))
-        graphmap = QPixmap("graph.png")
-        self.graphImage.setPixmap(graphmap)
+        suggest = self.graph.suggest_tofollow(id)
+        if suggest:
+            self.graph.visualize(suggest)
+            graphmap = QPixmap("graph.png")
+            self.graphImage.setPixmap(graphmap)
+        else:
+            QMessageBox.about(QPushButton(), "Alert", "No suggested users.")
 
     def searchHandle(self):
         posts = PostClass.map.get(self.searchBar.text().lower())
         layout = QVBoxLayout()
         if posts:
             for post in posts:
-                post = Post(post, "", "")
+                post = Post(post.body, post.author, post.topics)
                 layout.addWidget(post)
         widget = QWidget()
         widget.setLayout(layout)

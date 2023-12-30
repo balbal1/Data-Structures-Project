@@ -5,29 +5,32 @@ class Post:
     all_posts = []
     map=Map()
 
-    def __init__(self, body, topics):
+    def __init__(self, author, body, topics):
+        self.author = author
         self.body = body
         self.topics = topics
         self.all_posts.append(self)
         
     @classmethod
-    def parse_post(cls, node: Node):
+    def parse_post(cls, node: Node, author):
+        post = Post(author, "", [])
         for attrib in node.children:
             if attrib.name == "body":
-                body = attrib.text
-                cls.all_posts.append(body)
+                post.body = attrib.text
             
             elif attrib.name == "topics":
-                topics = []
                 for topic in attrib.children:
-                    topics.append(topic.text)
+                    post.topics.append(topic.text)
 
-        for word in cls.all_posts[-1].split():
+        cls.all_posts.append(post)
+        for word in author.split():
             cls.map.appendlistvalue(word.lower(),cls.all_posts[-1])
-        for topic in topics:
+        for word in cls.all_posts[-1].body.split():
+            cls.map.appendlistvalue(word.lower(),cls.all_posts[-1])
+        for topic in post.topics:
             cls.map.appendlistvalue(topic.lower(),cls.all_posts[-1])
 
-        return Post(body, topics)
+        return post
 
     @classmethod
     def search(cls, word):

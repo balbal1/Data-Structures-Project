@@ -30,7 +30,7 @@ class User:
                         name = attrib.text
                     elif attrib.name == "posts":
                         for post in attrib.children:
-                            posts.append(Post.parse_post(post))
+                            posts.append(Post.parse_post(post, name))
                     elif attrib.name == "followers":
                         for follower in attrib.children:
                             followers_ids.append(follower.children[0].text)
