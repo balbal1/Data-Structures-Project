@@ -1,4 +1,6 @@
-from Node import Node
+import sys
+sys.path.append("..")
+from xml_tree.Node import Node
 
 def xml2tree(s: str) -> Node:
     stack = []

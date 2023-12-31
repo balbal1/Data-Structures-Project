@@ -1,7 +1,9 @@
 import networkx as nx 
 import matplotlib.pyplot as plt 
 import numpy
-from  User_class import User
+import sys
+sys.path.append("..")
+from  network_graph.User_class import User
 
 class Graph_Analysis:
     def __init__(self):
@@ -92,5 +94,5 @@ class Graph_Analysis:
         numpy.random.seed(50)
         plt.figure(1,figsize=(8,8))
         nx.draw_networkx(G, font_size=12, font_color='black', node_size=3000, width=3, arrowsize=20, node_color=['#ff7f50' if (node_name in v)  else '#add8e6' for node_name in list(G.nodes)])
-        plt.savefig("graph.png")
+        plt.savefig("icons/graph.png")
         plt.clf()    
