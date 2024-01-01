@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QMainWindow, QWidget, QPushButton, QMessageBox, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QTabWidget, QFileDialog
+from PySide2.QtWidgets import QMainWindow, QWidget, QPushButton, QMessageBox, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QTabWidget, QFileDialog, QScrollArea, QLabel
 from PySide2.QtGui import QIcon, QTextCharFormat, QFont, Qt
 import sys
 sys.path.append("..")
@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
 
         self.setGeometry(400, 200, 1200, 800)
         self.setWindowTitle(" XML Editor")
-        self.setWindowIcon(QIcon("../icons/logo.png"))
+        self.setWindowIcon(QIcon("icons/logo.png"))
         self.tree = None
         self.stack = []
         self.redo_stack = []
@@ -25,7 +25,20 @@ class MainWindow(QMainWindow):
         self.inputTextArea = QPlainTextEdit()
         self.outputTextArea = QPlainTextEdit()
         self.outputTextArea.setReadOnly(True)
-        self.inputTextArea.textChanged.connect(self.closeButtons)           
+        self.inputTextArea.textChanged.connect(self.closeButtons)
+
+        self.logLayout = QVBoxLayout()
+        self.logLayout.addStretch()
+        self.logLayout.addWidget(QLabel(""))
+        self.logLayout.addStretch()
+        logWidget = QWidget()
+        logWidget.setObjectName("log")
+        logWidget.setLayout(self.logLayout)
+        self.logTextArea = QScrollArea()
+        self.logTextArea.setWidgetResizable(True)
+        self.logTextArea.setMaximumHeight(150)
+        self.logTextArea.setWidget(logWidget)
+        self.logTextArea.verticalScrollBar().rangeChanged.connect(self.scrollHandle)
         
         self.openButton = DoubleButton("icons/OpenSymbol", "Open", ["Open\r\nXML", "Open\nCompressed"])
         self.saveButton = DoubleButton("icons/SaveSymbol", "Save", ["Save\nas XML", "Save as\nCompressed"])
@@ -84,6 +97,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         layout.addWidget(self.tabs, 0)
         layout.addLayout(body, 1)
+        layout.addWidget(self.logTextArea, 2)
         layout.setContentsMargins(0,0,0,0)
         layout.addStretch()
         
@@ -108,6 +122,7 @@ class MainWindow(QMainWindow):
             text = self.inputTextArea.toPlainText()
             file.write(text)
             file.close()
+            self.sendMessage("File saved successfully!", "green")
         
     def helpHandle(self):
         QMessageBox.about(QPushButton(), "Help", "This is the help Section.")
@@ -119,27 +134,34 @@ class MainWindow(QMainWindow):
         self.outputTextArea.clear()
         self.outputTextArea.insertPlainText(self.tree.prettify())
         self.save_current_state()
+        self.sendMessage("Prettifying done successfully!", "green")
 
     def minifyHandle(self):
         self.outputTextArea.clear()
         self.outputTextArea.insertPlainText(self.tree.minify())
         self.save_current_state()
+        self.sendMessage("Minifying done successfully!", "green")
 
     def convertHandle(self):
         self.outputTextArea.clear()
         self.outputTextArea.insertPlainText(self.tree.convert(False, True))
         self.save_current_state()
+        self.sendMessage("Converted to JSON successfully!", "green")
 
     def showHandle(self):
         text = list(self.inputTextArea.toPlainText().split("\n"))
         errors = error_detection(text)
         if errors is None:
+            self.sendMessage("No xml tags found", "#bbbb00")
             pass
         elif errors == []:
             self.openButtons()
             self.tree = xml2tree(self.inputTextArea.toPlainText())
-            QMessageBox.about(QPushButton(), "Success", "No errors in XML")
+            self.sendMessage("No errors in XML", "green")
         else:
+            self.sendMessage(f'{len(errors)} error/s found in file:', "red")
+            for error in errors:
+                self.sendMessage(f'in line {error[0]+1}: {error[1]} for {error[2]}.', "red")
             self.inputTextArea.clear()
             myClassFormat = QTextCharFormat()
             for i, line in enumerate(text):
@@ -168,15 +190,15 @@ class MainWindow(QMainWindow):
             self.inputTextArea.textCursor().deletePreviousChar()
             self.openButtons()
             self.tree = xml2tree(self.inputTextArea.toPlainText())
-            QMessageBox.about(QPushButton(), "Success", "Errors fixed successfully!")
+            self.sendMessage("Errors fixed successfully!", "green")
         else:
-            QMessageBox.about(QPushButton(), "Error", "Invalix XML format. Can't fix errors.")
+            self.sendMessage("ERROR: Can't fix errors. Invalix XML format.", "red")
 
     def visualizeHandle(self):
         try:
             User.parse_users_node(self.tree)
         except Exception as e:
-            QMessageBox.about(QPushButton(), "Error", "Invalid social network XML provided")
+            self.sendMessage("ERROR: Can't generate network. Invalid social network XML provided.", "red")
         else:
             self.graphWindow = GraphWindow()
             self.graphWindow.show()
@@ -191,6 +213,7 @@ class MainWindow(QMainWindow):
             text = compress(self.inputTextArea.toPlainText())
             file.write(text)
             file.close()
+            self.sendMessage("File saved successfully!", "green")
     
     def decompressHandle(self):
         path = QFileDialog.getOpenFileName(self, 'Choose a file', '', 'comp files (*.comp)')
@@ -265,6 +288,23 @@ class MainWindow(QMainWindow):
         self.visualizeButton.setObjectName("disabled")
         self.updateTabs()
 
+    def sendMessage(self, message, color):
+        messageText = QLabel(message)
+        messageText.setStyleSheet("color: " + color)
+        layout = QHBoxLayout()
+        layout.addWidget(QLabel("> "))
+        layout.addWidget(messageText)
+        layout.addStretch()
+        layout.addWidget(QWidget())
+        layout.addStretch()
+        layout.setContentsMargins(0, 0, 0, 0)
+        text = QWidget()
+        text.setLayout(layout)
+        self.logLayout.addWidget(text)
+
+    def scrollHandle(self):
+        self.logTextArea.verticalScrollBar().setValue(self.logTextArea.verticalScrollBar().maximum())
+
     def updateTabs(self):
         i = self.tabs.currentIndex()
         self.tabs.removeTab(1)
@@ -283,3 +323,7 @@ class MainWindow(QMainWindow):
         tab.setLayout(bar)
         tab.setObjectName("bars")
         return tab
+
+    def closeEvent(self, event):
+        if self.graphWindow:
+            self.graphWindow.close()

@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QComboBox, QLineEdit, QScrollArea, QVBoxLayout, QHBoxLayout, QMessageBox
+from PySide2.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QComboBox, QLineEdit, QScrollArea, QVBoxLayout, QHBoxLayout
 from PySide2.QtGui import QIcon, QPixmap
 import sys
 sys.path.append("..")
@@ -11,7 +11,7 @@ class GraphWindow(QMainWindow):
     def __init__(self):
         super(GraphWindow, self).__init__()
         
-        self.setGeometry(200, 200, 1200, 800)
+        self.setGeometry(200, 100, 1200, 800)
         self.setWindowTitle(" Graph Viewer")
         self.setWindowIcon(QIcon("../icons/logo.png"))
         self.graph = Graph_Analysis()
@@ -20,6 +20,23 @@ class GraphWindow(QMainWindow):
         graphmap = QPixmap("icons/graph.png")
         self.graphImage = QLabel()
         self.graphImage.setPixmap(graphmap)
+
+        self.logLayout = QVBoxLayout()
+        self.logLayout.addStretch()
+        self.logLayout.addWidget(QLabel(""))
+        self.logLayout.addStretch()
+        logWidget = QWidget()
+        logWidget.setObjectName("log")
+        logWidget.setLayout(self.logLayout)
+        self.logTextArea = QScrollArea()
+        self.logTextArea.setWidgetResizable(True)
+        self.logTextArea.setMinimumHeight(120)
+        self.logTextArea.setWidget(logWidget)
+        self.logTextArea.verticalScrollBar().rangeChanged.connect(self.scrollHandle)
+        
+        outputBox = QVBoxLayout()
+        outputBox.addWidget(self.graphImage)
+        outputBox.addWidget(self.logTextArea)
 
         influencerButton = QPushButton("Find most influencer user")
         activeButton = QPushButton("Find most active user")
@@ -117,7 +134,7 @@ class GraphWindow(QMainWindow):
 
         self.layout = QHBoxLayout()
         self.layout.addLayout(self.toolBar, 0)
-        self.layout.addWidget(self.graphImage, 1)
+        self.layout.addLayout(outputBox, 1)
         self.layout.setContentsMargins(10,10,10,10)
         self.layout.addStretch()
         
@@ -136,11 +153,13 @@ class GraphWindow(QMainWindow):
         self.graph.visualize([self.graph.most_influencer])
         graphmap = QPixmap("icons/graph.png")
         self.graphImage.setPixmap(graphmap)
+        self.sendMessage("Most influencer user: " + self.graph.most_influencer.replace("\n", " "), "green")
 
     def activeHandle(self):
         self.graph.visualize([self.graph.most_active])
         graphmap = QPixmap("icons/graph.png")
         self.graphImage.setPixmap(graphmap)
+        self.sendMessage("Most active user: " + self.graph.most_active.replace("\n", " "), "green")
 
     def mutualHandle(self):
         id1 = self.mutualComboButton1.currentText()[-2]
@@ -150,8 +169,9 @@ class GraphWindow(QMainWindow):
             self.graph.visualize(mutual)
             graphmap = QPixmap("icons/graph.png")
             self.graphImage.setPixmap(graphmap)
+            self.sendMessage(f'{len(mutual)} mutual user/s found.', "green")
         else:
-            QMessageBox.about(QPushButton(), "Alert", "No mutual users.")
+            self.sendMessage("Alert: No mutual users.", "#bbbb00")
 
     def suggestHandle(self):
         id = self.suggestComboButton.currentText()[-2]
@@ -160,19 +180,31 @@ class GraphWindow(QMainWindow):
             self.graph.visualize(suggest)
             graphmap = QPixmap("icons/graph.png")
             self.graphImage.setPixmap(graphmap)
+            self.sendMessage(f'{len(suggest)} suggested user/s found.', "green")
         else:
-            QMessageBox.about(QPushButton(), "Alert", "No suggested users.")
+            self.sendMessage("Alert: No suggested users.", "#bbbb00")
 
     def searchHandle(self):
-        posts = PostClass.map.get(self.searchBar.text().lower())
-        layout = QVBoxLayout()
-        if posts:
-            for post in posts:
-                post = Post(post.body, post.author, post.topics)
-                layout.addWidget(post)
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.searchResults.setWidget(widget)
+        words = self.searchBar.text().lower().split()
+        if not words:
+            self.sendMessage("Alert: Search bar is empty", "#bbbb00")
+        else:
+            posts = PostClass.map.get(words[0])
+            for word in words:
+                posts = list(set(posts) & set(PostClass.map.get(word)))
+            if not posts:
+                self.sendMessage("No posts found.", "#bbbb00")
+            else:
+                self.sendMessage(f'{len(posts)} post/s found.', "green")
+                layout = QVBoxLayout()
+                if posts:
+                    for post in posts:
+                        post = Post(post.body, post.author, post.topics)
+                        layout.addWidget(post)
+                widget = QWidget()
+                widget.setObjectName("log")
+                widget.setLayout(layout)
+                self.searchResults.setWidget(widget)
 
     def updateComboBox(self):
         self.mutualComboButton2.clear()
@@ -181,3 +213,20 @@ class GraphWindow(QMainWindow):
             if user.id != self.mutualComboButton1.currentText()[-2]:
                 names.append(f'{user.name} ({user.id})')
         self.mutualComboButton2.addItems(names)
+
+    def sendMessage(self, message, color):
+        messageText = QLabel(message)
+        messageText.setStyleSheet("color: " + color)
+        layout = QHBoxLayout()
+        layout.addWidget(QLabel("> "))
+        layout.addWidget(messageText)
+        layout.addStretch()
+        layout.addWidget(QWidget())
+        layout.addStretch()
+        layout.setContentsMargins(0, 0, 0, 0)
+        text = QWidget()
+        text.setLayout(layout)
+        self.logLayout.addWidget(text)
+
+    def scrollHandle(self):
+        self.logTextArea.verticalScrollBar().setValue(self.logTextArea.verticalScrollBar().maximum())

@@ -24,14 +24,18 @@ QPushButton::menu-indicator{
 }
 
 #body {
-	background-color: rgb(255,255,255);
+	background-color: rgb(245,246,247);
 }
 
 QWidget {
-	font-size: 16px;
+	font-size: 18px;
 }
 
 QComboBox {
 	background-color: transparent;
 	text-align: center;
+}
+
+#log {
+	background-color: white;
 }
