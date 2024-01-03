@@ -1,7 +1,14 @@
+QWidget {
+	font-size: 18px;
+}
+
 QPushButton {
 	background-color: rgb(245,246,247);
 	border: 2px solid rgb(245,246,247);
-	font-size: 18px;
+}
+
+QLabel {
+	font-size: 20px;
 }
 
 QPushButton:hover {
@@ -27,9 +34,6 @@ QPushButton::menu-indicator{
 	background-color: rgb(245,246,247);
 }
 
-QWidget {
-	font-size: 18px;
-}
 
 QComboBox {
 	background-color: transparent;
@@ -38,4 +42,12 @@ QComboBox {
 
 #log {
 	background-color: white;
+}
+
+QTabBar {
+	font-size: 24px;
+}
+
+QPlainTextEdit {
+	font-size: 20px;
 }

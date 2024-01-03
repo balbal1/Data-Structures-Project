@@ -22,10 +22,12 @@ def error_detection(xml_file):
     
     found_text = False
     # Detect errors
+    flag = None
     for tag in tags_list:
         if not tag[1].startswith('/'):  # open Tag
+            flag = tag
             if found_text:
-                updateTags(openStack[-1][0], 'Missing Close tag', openStack[-1][1])
+                updateTags(openStack[-1][0], 'Missing close tag', openStack[-1][1])
                 openStack.pop()
                 found_text = False
             openStack.append(tag)
@@ -39,14 +41,19 @@ def error_detection(xml_file):
                     openStack.pop()
                     found_text = False
                 else:
-                    if found_text:
-                        found_text = False
                     if len(openStack) > 1 and closeTag == openStack[-2][1]:
-                        updateTags(openStack[-1][0], 'Missing Close tag', openStack[-1][1])
+                        updateTags(openStack[-1][0], 'Missing close tag', openStack[-1][1])
                         openStack.pop() # pop the wrong tag
-                        openStack.pop() # pop the right tag
+                        openStack.pop() 
+                        # pop the right tag
+                    elif found_text:
+                        updateTags(flag[0], "Mismatching close tag", flag[1])
+                        updateTags(tag_line, "Mismatching open tag", closeTag)
+                        openStack.pop()
                     else:
                         updateTags(tag_line, 'Missing open tag', closeTag)
+                    if found_text:
+                        found_text = False
             else:
                 updateTags(tag_line, 'Missing open tag', closeTag)
 
@@ -55,8 +62,10 @@ def error_detection(xml_file):
 
     if openStack != []:
         while openStack != []:
-            updateTags(openStack[-1][0], 'Missing Close tag', openStack[-1][1])
+            updateTags(openStack[-1][0], 'Missing close tag', openStack[-1][1])
             openStack.pop()
+
+    tags.sort(key=lambda x: int(x[0]))
     
     return tags
 

@@ -18,7 +18,7 @@ class Map:
             else:
                 return node.value
             
-        return None
+        return []
 
     def appendlistvalue(self, key, value):
         self.put(key, value, False)

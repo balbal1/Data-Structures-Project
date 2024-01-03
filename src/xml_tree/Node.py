@@ -29,7 +29,7 @@ class Node():
         if isRoot:
             return "{\n" + self.convert(False)[:-2] + "\n}"
 
-        string = "  " * (self.level + 1)
+        string = "    " * (self.level + 1)
         if not isArray:
             string += "\"" + self.name + "\": "
         
@@ -46,7 +46,7 @@ class Node():
         string += brackets[0] + "\n"
         for child in self.children:
             string += child.convert(isArray)
-        return string[:-2] + "\n" + "  " * (self.level + 1) + brackets[1] + ",\n"
+        return string[:-2] + "\n" + "    " * (self.level + 1) + brackets[1] + ",\n"
 
     def print(self):
         for line in self.stringify():
@@ -54,11 +54,11 @@ class Node():
 
     def stringify(self):
         if self.children == []:
-            return ["  " * self.level + "<" + self.name + ">" + str(self.text) + "</" + self.name + ">"]
-        string = ["  " * self.level + "<" + self.name + ">"]
+            return ["    " * self.level + "<" + self.name + ">" + str(self.text) + "</" + self.name + ">"]
+        string = ["    " * self.level + "<" + self.name + ">"]
         for child in self.children:
             string.extend(child.stringify())
-        string.append("  " * self.level + "</" + self.name + ">")
+        string.append("    " * self.level + "</" + self.name + ">")
         return string
 
     def getTest(self):

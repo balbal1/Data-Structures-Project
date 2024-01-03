@@ -10,5 +10,6 @@ with open("src/styles/mainStyle.qss", "r") as f:
     _style = f.read()
     window.setStyleSheet(_style)
 
+window.showMaximized()
 app.exec_()
 sys.exit()

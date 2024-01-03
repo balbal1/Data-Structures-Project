@@ -19,8 +19,8 @@ class User:
 
     @classmethod
     def parse_users_node(cls, node: Node):
-        # TODO: Parse users from node class
-        
+        cls._all_users = []
+        cls._users_map = Map()
         if node.name == "users":
             for user in node.children:
                 posts = []
@@ -69,39 +69,3 @@ class User:
         for user in cls._all_users:
             for follower in user.followers:
                 follower.following.append(user)
-
-    @classmethod
-    def print_all_users(cls):
-        for user in User.get_all_users():
-            print("User: " + user.name)
-            print("ID: " + user.id)
-            print("Followers: ", end="")
-            for follower in user.followers:
-                print(follower.name, end=" - ")
-
-            print("\nFollowing: ", end="")
-            for following in user.following:
-                print(following.name, end=" - ")
-
-            print("\n\nPosts:")
-            for post in user.posts:
-                print(post.body, end=" - ")
-                print(post.topics)
-
-            print(Post.search('Education'))
-
-            print("------")
-
-    @classmethod
-    def test(cls):
-        with open('./sample.xml', 'r') as file:
-            data = file.read()
-
-        node = xml2tree(data)
-
-        # node.print()
-
-        User.parse_users_node(node)
-
-        User.print_all_users()
-

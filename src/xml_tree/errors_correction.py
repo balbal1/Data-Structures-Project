@@ -6,6 +6,7 @@ def error_correction(tags, xml_file):
     
     corrected_xml_file = xml_file.copy()
     
+    flag = None
     #Reversed the vector to ensure that tags are inserted in the correct order
     for tag in reversed(tags):
         #tag[0] : line of the error, tag[1]: error type, 
@@ -18,9 +19,9 @@ def error_correction(tags, xml_file):
                 open_tag_insert_line = 0
                 corrected_xml_file.insert(0, open_tag)  # Insert at position 0 if None or 0
             for tag in tags:
-                if tag[0] > open_tag_insert_line:
+                if tag[0] >= open_tag_insert_line:
                     tag[0] += 1
-        elif tag[1] == 'Missing Close tag':
+        elif tag[1] == 'Missing close tag':
             close_tag = f"</{tag[2]}>"
             close_tag_insert_line = find_close_tag_insert_line(tag[0]+1, corrected_xml_file)
             if close_tag_insert_line is not None and close_tag_insert_line < len(corrected_xml_file):
@@ -31,6 +32,10 @@ def error_correction(tags, xml_file):
             for tag in tags:
                 if tag[0] > close_tag_insert_line:
                     tag[0] += 1
+        elif tag[1] == "Mismatching open tag":
+            flag = tag
+        elif tag[1] == "Mismatching close tag":
+            corrected_xml_file[tag[0]] = corrected_xml_file[tag[0]].replace(tag[2], flag[2])
 
 
     return corrected_xml_file
@@ -60,6 +65,7 @@ def find_open_tag_insert_line(tag_line, xml_file):
     else:
         # The tag has children
         while tag_line >= 0:
+            line_content = xml_file[tag_line].strip()
             if line_content:
                 if re.match(r'<[a-z]+>[0-9a-zA-Z\s]+<\/[a-z]+>',line_content): #detect <tag>text</tag> case
                     tag_line -= 1
@@ -74,9 +80,7 @@ def find_open_tag_insert_line(tag_line, xml_file):
                 # Check if the line contains a closing tag
                 elif line_content[0:2] == '</':
                     stack.append(line_content) 
-
             tag_line -= 1
-            line_content = xml_file[tag_line].strip()
             
         return None
 
@@ -104,7 +108,9 @@ def find_close_tag_insert_line(tag_line, xml_file):
         return tag_line
     else:
         # The tag has children
+        tag_line -= 1
         while tag_line < len(xml_file):
+            line_content = xml_file[tag_line].strip()
             if line_content:
                 if re.match(r'<[a-z]+>[0-9a-zA-Z\s]+<\/[a-z]+>',line_content): #detect <tag>text</tag> case
                     tag_line += 1
@@ -119,8 +125,6 @@ def find_close_tag_insert_line(tag_line, xml_file):
                 # Check if the line contains a closing tag
                 elif line_content[0] == '<' and line_content[1] !='/':
                     stack.append(line_content) 
-
             tag_line += 1
-            line_content = xml_file[tag_line].strip()
             
         return None

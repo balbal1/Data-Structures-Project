@@ -3,7 +3,6 @@ from PySide2.QtGui import QIcon, QPixmap
 import sys
 sys.path.append("..")
 from GUI.Post import Post
-from network_graph.Post_class import Post as PostClass
 from network_graph.GraphAnalysis import Graph_Analysis
 
 class GraphWindow(QMainWindow):
@@ -11,7 +10,7 @@ class GraphWindow(QMainWindow):
     def __init__(self):
         super(GraphWindow, self).__init__()
         
-        self.setGeometry(200, 100, 1200, 800)
+        self.showMaximized()
         self.setWindowTitle(" Graph Viewer")
         self.setWindowIcon(QIcon("../icons/logo.png"))
         self.graph = Graph_Analysis()
@@ -30,7 +29,7 @@ class GraphWindow(QMainWindow):
         logWidget.setLayout(self.logLayout)
         self.logTextArea = QScrollArea()
         self.logTextArea.setWidgetResizable(True)
-        self.logTextArea.setMinimumHeight(120)
+        self.logTextArea.setFixedHeight(150)
         self.logTextArea.setWidget(logWidget)
         self.logTextArea.verticalScrollBar().rangeChanged.connect(self.scrollHandle)
         
@@ -165,10 +164,10 @@ class GraphWindow(QMainWindow):
         id1 = self.mutualComboButton1.currentText()[-2]
         id2 = self.mutualComboButton2.currentText()[-2]
         mutual = self.graph.mutual_followers(id1, id2)
+        self.graph.visualize(mutual)
+        graphmap = QPixmap("icons/graph.png")
+        self.graphImage.setPixmap(graphmap)
         if mutual:
-            self.graph.visualize(mutual)
-            graphmap = QPixmap("icons/graph.png")
-            self.graphImage.setPixmap(graphmap)
             self.sendMessage(f'{len(mutual)} mutual user/s found.', "green")
         else:
             self.sendMessage("Alert: No mutual users.", "#bbbb00")
@@ -176,23 +175,22 @@ class GraphWindow(QMainWindow):
     def suggestHandle(self):
         id = self.suggestComboButton.currentText()[-2]
         suggest = self.graph.suggest_tofollow(id)
+        self.graph.visualize(suggest)
+        graphmap = QPixmap("icons/graph.png")
+        self.graphImage.setPixmap(graphmap)
         if suggest:
-            self.graph.visualize(suggest)
-            graphmap = QPixmap("icons/graph.png")
-            self.graphImage.setPixmap(graphmap)
             self.sendMessage(f'{len(suggest)} suggested user/s found.', "green")
         else:
             self.sendMessage("Alert: No suggested users.", "#bbbb00")
 
     def searchHandle(self):
-        words = self.searchBar.text().lower().split()
+        words = list(self.searchBar.text().lower().split())
         if not words:
             self.sendMessage("Alert: Search bar is empty", "#bbbb00")
         else:
-            posts = PostClass.map.get(words[0])
-            for word in words:
-                posts = list(set(posts) & set(PostClass.map.get(word)))
+            posts = self.graph.search_posts(words)
             if not posts:
+                self.searchResults.setWidget(QWidget())
                 self.sendMessage("No posts found.", "#bbbb00")
             else:
                 self.sendMessage(f'{len(posts)} post/s found.', "green")
@@ -216,7 +214,7 @@ class GraphWindow(QMainWindow):
 
     def sendMessage(self, message, color):
         messageText = QLabel(message)
-        messageText.setStyleSheet("color: " + color)
+        messageText.setStyleSheet("font-size: 22px; color: " + color)
         layout = QHBoxLayout()
         layout.addWidget(QLabel("> "))
         layout.addWidget(messageText)

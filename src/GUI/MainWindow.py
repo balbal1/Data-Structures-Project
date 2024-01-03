@@ -1,8 +1,8 @@
 from PySide2.QtWidgets import QMainWindow, QWidget, QPushButton, QMessageBox, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QTabWidget, QFileDialog, QScrollArea, QLabel
-from PySide2.QtGui import QIcon, QTextCharFormat, QFont, Qt
+from PySide2.QtGui import QIcon, QTextCharFormat, Qt
 import sys
 sys.path.append("..")
-from GUI.Button import Button, DoubleButton
+from GUI.Button import Button
 from xml_tree.parse_xml import xml2tree
 from xml_tree.compression import compress, decompress
 from xml_tree.errors_detection import error_detection
@@ -15,12 +15,13 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
-        self.setGeometry(400, 200, 1200, 800)
-        self.setWindowTitle(" XML Editor")
+        self.setWindowTitle(" XML Analyzer")
         self.setWindowIcon(QIcon("icons/logo.png"))
+        self.graphWindow = None
         self.tree = None
         self.stack = []
         self.redo_stack = []
+        self.isOpen = False
 
         self.inputTextArea = QPlainTextEdit()
         self.outputTextArea = QPlainTextEdit()
@@ -31,27 +32,30 @@ class MainWindow(QMainWindow):
         self.logLayout.addStretch()
         self.logLayout.addWidget(QLabel(""))
         self.logLayout.addStretch()
+        # self.logLayout.setContentsMargins(10, 10, 10, 10)
         logWidget = QWidget()
         logWidget.setObjectName("log")
         logWidget.setLayout(self.logLayout)
         self.logTextArea = QScrollArea()
         self.logTextArea.setWidgetResizable(True)
-        self.logTextArea.setMaximumHeight(150)
+        self.logTextArea.setMaximumHeight(180)
         self.logTextArea.setWidget(logWidget)
         self.logTextArea.verticalScrollBar().rangeChanged.connect(self.scrollHandle)
         
-        self.openButton = DoubleButton("icons/OpenSymbol", "Open", ["Open\r\nXML", "Open\nCompressed"])
-        self.saveButton = DoubleButton("icons/SaveSymbol", "Save", ["Save\nas XML", "Save as\nCompressed"])
+        self.openButton = Button("icons/OpenSymbol", "Open XML")
+        self.saveButton = Button("icons/SaveSymbol", "Save\nas XML", 10)
+        self.decompressButton = Button("icons/CompressSymbol", "Open Compressed", 10)
+        self.compressButton = Button("icons/DeCompressSymbol", "Save as Compressed", 10)
         self.helpButton = Button("icons/HelpSymbol", "Help")
         self.closeButton = Button("icons/CloseSymbol", "Quit")
         
         self.undoButton = Button("icons/UndoSymbol", "Undo")
         self.redoButton = Button("icons/RedoSymbol", "Redo")
-        self.showButton = Button("icons/ShowSymbol", "Detect Errors")
+        self.showButton = Button("icons/ShowSymbol", "Detect\nErrors", 10)
         self.fixButton = Button("icons/FixSymbol", "Fix Errors")
         self.prettifyButton = Button("icons/FormatSymbol", "Prettify")
         self.minifyButton = Button("icons/MinifySymbol", "Minify")
-        self.convertButton = Button("icons/ConvertSymbol", "Convert")
+        self.convertButton = Button("icons/ConvertSymbol", "Convert\nto JSON", 10)
         self.visualizeButton = Button("icons/VisualizeSymbol", "Visualize Network", 10)
         
         self.undoButton.disabled = True
@@ -68,10 +72,10 @@ class MainWindow(QMainWindow):
         self.convertButton.setObjectName("disabled")
         self.visualizeButton.setObjectName("disabled")
 
-        self.openButton.clicked_normal.connect(self.openHandle)
-        self.openButton.clicked_compressed.connect(self.decompressHandle)
-        self.saveButton.clicked_normal.connect(self.saveHandle)
-        self.saveButton.clicked_compressed.connect(self.compressHandle)
+        self.openButton.clicked.connect(self.openHandle)
+        self.saveButton.clicked.connect(self.saveHandle)
+        self.decompressButton.clicked.connect(self.decompressHandle)
+        self.compressButton.clicked.connect(self.compressHandle)
         self.helpButton.clicked.connect(self.helpHandle)
         self.closeButton.clicked.connect(self.closeHandle)
 
@@ -86,7 +90,7 @@ class MainWindow(QMainWindow):
 
         self.tabs = QTabWidget()
         self.tabs.setTabPosition(QTabWidget.North)
-        self.tabs.addTab(self.buttonBarLayout([self.openButton, self.saveButton, self.helpButton, self.closeButton]), "file")
+        self.tabs.addTab(self.buttonBarLayout([self.openButton, self.saveButton, self.decompressButton, self.compressButton, self.helpButton, self.closeButton]), "file")
         self.tabs.addTab(self.buttonBarLayout([self.undoButton, self.redoButton, self.showButton, self.fixButton, self.prettifyButton, self.minifyButton, self.convertButton, self.visualizeButton]), "edit")
         
         body = QHBoxLayout()
@@ -111,6 +115,9 @@ class MainWindow(QMainWindow):
         if path != ('', ''):
             self.inputTextArea.clear()
             self.outputTextArea.clear()
+            myClassFormat = QTextCharFormat()
+            myClassFormat.setForeground(Qt.black)
+            self.inputTextArea.setCurrentCharFormat(myClassFormat)
             with open(path[0]) as file_in:
                 for line in file_in:
                     self.inputTextArea.insertPlainText(line)
@@ -155,8 +162,15 @@ class MainWindow(QMainWindow):
             self.sendMessage("No xml tags found", "#bbbb00")
             pass
         elif errors == []:
-            self.openButtons()
-            self.tree = xml2tree(self.inputTextArea.toPlainText())
+            myClassFormat = QTextCharFormat()
+            myClassFormat.setForeground(Qt.black)
+            self.inputTextArea.setCurrentCharFormat(myClassFormat)
+            text = self.inputTextArea.toPlainText()
+            self.inputTextArea.clear()
+            self.inputTextArea.insertPlainText(text)
+            if not self.isOpen:
+                self.openButtons()
+                self.tree = xml2tree(self.inputTextArea.toPlainText())
             self.sendMessage("No errors in XML", "green")
         else:
             self.sendMessage(f'{len(errors)} error/s found in file:', "red")
@@ -180,14 +194,14 @@ class MainWindow(QMainWindow):
         text = list(self.inputTextArea.toPlainText().split("\n"))
         text = error_correction(error_detection(text), text)
         errors = error_detection(text)
+        self.inputTextArea.clear()
+        myClassFormat = QTextCharFormat()
+        myClassFormat.setForeground(Qt.black)
+        self.inputTextArea.setCurrentCharFormat(myClassFormat)
+        for line in text:
+            self.inputTextArea.insertPlainText(line + "\n")
+        self.inputTextArea.textCursor().deletePreviousChar()
         if errors == []:
-            self.inputTextArea.clear()
-            myClassFormat = QTextCharFormat()
-            myClassFormat.setForeground(Qt.black)
-            self.inputTextArea.setCurrentCharFormat(myClassFormat)
-            for line in text:
-                self.inputTextArea.insertPlainText(line + "\n")
-            self.inputTextArea.textCursor().deletePreviousChar()
             self.openButtons()
             self.tree = xml2tree(self.inputTextArea.toPlainText())
             self.sendMessage("Errors fixed successfully!", "green")
@@ -202,6 +216,7 @@ class MainWindow(QMainWindow):
         else:
             self.graphWindow = GraphWindow()
             self.graphWindow.show()
+            self.graphWindow.showMaximized()
             with open("src/styles/graphStyle.qss", "r") as f:
                 _style = f.read()
                 self.graphWindow.setStyleSheet(_style)
@@ -220,6 +235,10 @@ class MainWindow(QMainWindow):
         if path != ('', ''):
             text = decompress(path[0])
             self.inputTextArea.clear()
+            self.outputTextArea.clear()
+            myClassFormat = QTextCharFormat()
+            myClassFormat.setForeground(Qt.black)
+            self.inputTextArea.setCurrentCharFormat(myClassFormat)
             self.inputTextArea.insertPlainText(text)
     
     def save_current_state(self):
@@ -259,13 +278,12 @@ class MainWindow(QMainWindow):
 
 
     def openButtons(self):
-        self.showButton.disabled = True
+        self.isOpen = True
         self.fixButton.disabled = True
         self.prettifyButton.disabled = False
         self.minifyButton.disabled = False
         self.convertButton.disabled = False
         self.visualizeButton.disabled = False
-        self.showButton.setObjectName("disabled")
         self.fixButton.setObjectName("disabled")
         self.prettifyButton.setObjectName("enabled")
         self.minifyButton.setObjectName("enabled")
@@ -274,13 +292,12 @@ class MainWindow(QMainWindow):
         self.updateTabs()
 
     def closeButtons(self):
-        self.showButton.disabled = False
+        self.isOpen = False
         self.fixButton.disabled = True
         self.prettifyButton.disabled = True
         self.minifyButton.disabled = True
         self.convertButton.disabled = True
         self.visualizeButton.disabled = True
-        self.showButton.setObjectName("enabled")
         self.fixButton.setObjectName("disabled")
         self.prettifyButton.setObjectName("disabled")
         self.minifyButton.setObjectName("disabled")
@@ -290,7 +307,7 @@ class MainWindow(QMainWindow):
 
     def sendMessage(self, message, color):
         messageText = QLabel(message)
-        messageText.setStyleSheet("color: " + color)
+        messageText.setStyleSheet("font-size: 22px; color: " + color)
         layout = QHBoxLayout()
         layout.addWidget(QLabel("> "))
         layout.addWidget(messageText)
