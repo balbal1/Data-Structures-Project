@@ -30,26 +30,6 @@ class Map:
     def is_empty(self):
         return self.root == None
     
-    @classmethod
-    def test(cls):
-        map = Map()
-
-        map.put(1, "a")
-        map.put(2, "b")
-        map.put(3, "c")
-        map.put(4, "d")
-        map.put(5, "e")
-        map.put(6, "f")
-        map.put(20, "x")
-
-        print(map.get(1))
-        print(map.get(2))
-        print(map.get(3))
-        print(map.get(20))
-
-
-        print(map.contains(10))
-        print(map.contains(2))
         
     # Private Methods
                 

@@ -61,7 +61,7 @@ class User:
         for user in cls._all_users:
             for follower_id in user.followers_ids:
                 follower = cls.get_user(follower_id)
-                follower.followers.append(user)
+                user.followers.append(follower)
     
     @classmethod
     def _populate_following(cls):
