@@ -26,12 +26,12 @@ class Post:
 
         cls.all_posts.append(post)
         for word in author.split():
-            cls.map.appendlistvalue(word.lower(),cls.all_posts[-1])
-        for word in cls.all_posts[-1].body.split():
-            if cls.all_posts[-1] not in cls.map.get(word.lower()):
-                cls.map.appendlistvalue(word.lower(),cls.all_posts[-1])
+            cls.map.appendlistvalue(word.lower(),post)
+        for word in post.body.split():
+            if post not in cls.map.get(word.lower()):
+                cls.map.appendlistvalue(word.lower(),post)
         for topic in post.topics:
-            cls.map.appendlistvalue(topic.lower(),cls.all_posts[-1])
+            cls.map.appendlistvalue(topic.lower(),post)
 
         return post
 

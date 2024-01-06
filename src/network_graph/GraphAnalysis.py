@@ -63,7 +63,7 @@ class Graph_Analysis:
         return suggest
 
     def search_posts(self, words):
-        posts = Post.map.get(words[0])
+        posts = []
         for word in words:
             new_posts = Post.map.get(word)
             for post in new_posts:

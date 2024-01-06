@@ -46,9 +46,8 @@ def error_detection(xml_file):
                         openStack.pop() # pop the wrong tag
                         openStack.pop() 
                         # pop the right tag
-                    elif found_text:
-                        updateTags(flag[0], "Mismatching close tag", flag[1])
-                        updateTags(tag_line, "Mismatching open tag", closeTag)
+                    elif found_text or flag and flag[0] == tag_line:
+                        updateTags(tag_line, "Mismatching tags", [closeTag, flag[1], flag[0]])
                         openStack.pop()
                     else:
                         updateTags(tag_line, 'Missing open tag', closeTag)

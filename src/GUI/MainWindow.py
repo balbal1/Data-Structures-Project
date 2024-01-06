@@ -175,14 +175,25 @@ class MainWindow(QMainWindow):
         else:
             self.sendMessage(f'{len(errors)} error/s found in file:', "red")
             for error in errors:
-                self.sendMessage(f'in line {error[0]+1}: {error[1]} for {error[2]}.', "red")
+                if error[1][:11] == "Mismatching":
+                    if error[1] == "Mismatching tags":
+                        if error[0] == error[2][2]:
+                            self.sendMessage(f'in line {error[0]+1}: {error[1]} between {error[2][1]} and {error[2][0]}.', "red")
+                        else:
+                            self.sendMessage(f'in lines {error[2][2]+1} and {error[0]+1}: {error[1]} between {error[2][1]} and {error[2][0]}.', "red")
+                else:
+                    self.sendMessage(f'in line {error[0]+1}: {error[1]} for {error[2]}.', "red")
             self.inputTextArea.clear()
             myClassFormat = QTextCharFormat()
+            errorLines = []
+            for error in errors:
+                errorLines.append(error[0])
+                if error[1] == "Mismatching tags":
+                    errorLines.append(error[2][2])
             for i, line in enumerate(text):
                 myClassFormat.setForeground(Qt.black)
-                for error in errors:
-                    if error[0] == i and error[1] != "Valid":
-                        myClassFormat.setForeground(Qt.red)
+                if i in errorLines:
+                    myClassFormat.setForeground(Qt.red)
                 self.inputTextArea.setCurrentCharFormat(myClassFormat)
                 self.inputTextArea.insertPlainText(line + "\n")
             self.inputTextArea.textCursor().deletePreviousChar()

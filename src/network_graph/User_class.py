@@ -20,6 +20,9 @@ class User:
     def parse_users_node(cls, node: Node):
         cls._all_users = []
         cls._users_map = Map()
+        Post.all_posts = []
+        Post.map = Map()
+        cls._users_map = Map()
         if node.name == "users":
             for user in node.children:
                 posts = []

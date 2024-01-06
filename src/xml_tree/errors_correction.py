@@ -6,7 +6,6 @@ def error_correction(tags, xml_file):
     
     corrected_xml_file = xml_file.copy()
     
-    flag = None
     #Reversed the vector to ensure that tags are inserted in the correct order
     for tag in reversed(tags):
         #tag[0] : line of the error, tag[1]: error type, 
@@ -32,10 +31,8 @@ def error_correction(tags, xml_file):
             for tag in tags:
                 if tag[0] > close_tag_insert_line:
                     tag[0] += 1
-        elif tag[1] == "Mismatching open tag":
-            flag = tag
-        elif tag[1] == "Mismatching close tag":
-            corrected_xml_file[tag[0]] = corrected_xml_file[tag[0]].replace(tag[2], flag[2])
+        elif tag[1] == "Mismatching tags":
+            corrected_xml_file[tag[0]] = corrected_xml_file[tag[0]].replace(f'</{tag[2][0]}>', f'</{tag[2][1]}>')
 
 
     return corrected_xml_file

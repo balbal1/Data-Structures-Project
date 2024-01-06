@@ -20,25 +20,18 @@ class Post(QWidget):
                     POST+=f'<span style="background-color:yellow">{word}</span> '
                 else:
                     POST+=f'{word} '   
+            POST = POST[:-1]
             POST+='</html>'
             return POST
         
         post = highlighting(post)
         postText = QLabel(post)
         postText.setWordWrap(True)
-        postText.setContentsMargins(5,5,5,5)
+        postText.setContentsMargins(10,5,5,5)
     
         author = highlighting(author)
-        postAuthor = QLabel(author)
-        postAuthorTitle = QLabel("Author:")
-
-        postTitle = QHBoxLayout()
+        postTitle = QLabel("Author: " + author)
         postTitle.setContentsMargins(5,5,5,5)
-        postTitle.addWidget(postAuthorTitle)
-        postTitle.addWidget(postAuthor)
-        postTitle.addStretch()
-        postTitle.addWidget(QLabel())
-        postTitle.addStretch()
 
         topicsText = ""
         for topic in topics:
@@ -48,7 +41,7 @@ class Post(QWidget):
         topicsBar = QLabel("Topics: " + topicsText + ".")
 
         layout = QVBoxLayout()
-        layout.addLayout(postTitle)
+        layout.addWidget(postTitle)
         layout.addWidget(postText)
         layout.addWidget(topicsBar)
         
