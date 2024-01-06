@@ -12,7 +12,7 @@ class GraphWindow(QMainWindow):
         
         self.showMaximized()
         self.setWindowTitle(" Graph Viewer")
-        self.setWindowIcon(QIcon("../icons/logo.png"))
+        self.setWindowIcon(QIcon("icons/logo.png"))
         self.graph = Graph_Analysis()
 
         self.graph.visualize([])
