@@ -28,7 +28,8 @@ class Post:
         for word in author.split():
             cls.map.appendlistvalue(word.lower(),cls.all_posts[-1])
         for word in cls.all_posts[-1].body.split():
-            cls.map.appendlistvalue(word.lower(),cls.all_posts[-1])
+            if cls.all_posts[-1] not in cls.map.get(word.lower()):
+                cls.map.appendlistvalue(word.lower(),cls.all_posts[-1])
         for topic in post.topics:
             cls.map.appendlistvalue(topic.lower(),cls.all_posts[-1])
 
