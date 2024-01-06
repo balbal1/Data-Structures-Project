@@ -45,8 +45,8 @@ class Graph_Analysis:
             print("Vertex ", user1, " does not exist.")
         elif user2 not in self.users:
             print("Vertex ", user2, " does not exist.")
-        followers1=user1.followers
-        followers2=user2.followers
+        followers1=user1.following
+        followers2=user2.following
         mutual=[]
         for f in followers1:
             if f in followers2:
@@ -56,9 +56,9 @@ class Graph_Analysis:
     def suggest_tofollow(self, userid):
         user = User.get_user(userid)
         suggest=[]
-        for f in user.followers:
-            for ff in f.followers:
-                if ff not in user.followers and ff is not user and ff not in suggest:
+        for f in user.following:
+            for ff in f.following:
+                if ff not in user.following and ff is not user and ff not in suggest:
                     suggest.append(ff.name.replace(' ', '\n') + "\n" + f'({ff.id})')
         return suggest
 
