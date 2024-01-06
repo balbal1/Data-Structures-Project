@@ -1,5 +1,6 @@
 from PySide2.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QComboBox, QLineEdit, QScrollArea, QVBoxLayout, QHBoxLayout
 from PySide2.QtGui import QIcon, QPixmap
+
 import sys
 sys.path.append("..")
 from GUI.Post import Post
@@ -189,6 +190,7 @@ class GraphWindow(QMainWindow):
             self.sendMessage("Alert: Search bar is empty", "#bbbb00")
         else:
             posts = self.graph.search_posts(words)
+
             if not posts:
                 self.searchResults.setWidget(QWidget())
                 self.sendMessage("No posts found.", "#bbbb00")
@@ -197,7 +199,7 @@ class GraphWindow(QMainWindow):
                 layout = QVBoxLayout()
                 if posts:
                     for post in posts:
-                        post = Post(post.body, post.author, post.topics)
+                        post = Post(post.body, post.author, post.topics, words)
                         layout.addWidget(post)
                 widget = QWidget()
                 widget.setObjectName("log")
