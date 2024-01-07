@@ -1,7 +1,7 @@
 <users>
     <user>
         <id>1</id>
-        <name>Ahmed Ali</name>
+        <name>Ahmed </name>
         <posts>
             <post>
                 <body>
@@ -38,7 +38,7 @@
     </user>
     <user>
         <id>2</id>
-        <name>Yasser Ahmed</name>
+        <name>Rana</name>
         <posts>
             <post>
                 <body>
@@ -59,7 +59,7 @@
     </user>
     <user>
         <id>3</id>
-        <name>Mohamed Sherif</name>
+        <name>Hagar</name>
         <posts>
             <post>
                 <body>
