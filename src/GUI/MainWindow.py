@@ -119,8 +119,12 @@ class MainWindow(QMainWindow):
             myClassFormat.setForeground(Qt.black)
             self.inputTextArea.setCurrentCharFormat(myClassFormat)
             with open(path[0]) as file_in:
+                len = 0
                 for line in file_in:
+                    if len > 1000:
+                        break
                     self.inputTextArea.insertPlainText(line)
+                    len += 1
     
     def saveHandle(self):
         path = QFileDialog.getSaveFileName(self, 'Create a file', '', 'xml files (*.xml)')

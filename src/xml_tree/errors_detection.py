@@ -31,7 +31,7 @@ def error_detection(xml_file):
                 openStack.pop()
                 found_text = False
             openStack.append(tag)
-            if xml_file[tag[0]].strip()[-1] != '>' or (xml_file[tag[0]+1].strip() and re.findall(r'<(/?\w+)>', xml_file[tag[0]+1]) == []):
+            if xml_file[tag[0]].strip()[-1] != '>' or ((len(xml_file) > tag[0]+1) and xml_file[tag[0]+1].strip() and re.findall(r'<(/?\w+)>', xml_file[tag[0]+1]) == []):
                 found_text = True
         elif tag[1].startswith('/'):  # close Tag
             closeTag = tag[1][1:]
